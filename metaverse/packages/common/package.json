@@ -3,19 +3,21 @@
   "version": "1.0.0",
   "main": "index.ts",
   "exports": {
-    "./schema": "./dist/index.js"
+    "./auth": "./dist/schemas/auth.schema.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -b",
     "start": "node dist/index.js",
-    "dev": "npm run build && npm run start"
+    "dev": "npm run build && npm run start",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "@repo/db": "workspace:*"
   },
   "description": "",
   "dependencies": {

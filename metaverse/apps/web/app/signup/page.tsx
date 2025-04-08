@@ -12,7 +12,7 @@ import {
 import { Input } from "@ui/components/ui/input";
 import { Label } from "@ui/components/ui/label";
 import Link from "next/link";
-import { signUpSchema } from "@repo/common/schema";
+import { signUpSchema } from "@repo/common/auth";
 import axios from "axios";
 
 export default function SignUpPage() {

@@ -11,7 +11,7 @@ import {
 import { Input } from "@ui/components/ui/input";
 import { Label } from "@ui/components/ui/label";
 import Link from "next/link";
-import { signInSchema } from "@repo/common/schema";
+import { signInSchema } from "@repo/common/auth";
 import { useState } from "react";
 import axios from "axios";
 

@@ -1,10 +1,11 @@
+import { signUpSchema, signInSchema } from "@repo/common/auth";
 import jwt from "jsonwebtoken";
-import { signInSchema, signUpSchema } from "@repo/common/schema";
 import { prisma } from "@repo/db/client";
 import { Request, Response, RequestHandler } from "express";
+import { comparePassword, encryptPassword } from "../utils/auth.utils";
+import { envConfig } from "../configs/env";
 
-// TODO - pending env
-const JWT_SECRET = "secret";
+const JWT_SECRET = envConfig.JWT_SECRET;
 
 export const signUpController: RequestHandler = async (
   req: Request,
@@ -20,7 +21,7 @@ export const signUpController: RequestHandler = async (
       return;
     }
 
-    const { username, email, password } = parsedData.data;
+    const { username, name, email, password, role, avatar } = parsedData.data;
 
     const userExists = await prisma.user.findFirst({
       where: {
@@ -35,12 +36,16 @@ export const signUpController: RequestHandler = async (
       return;
     }
 
+    const hashedPassword = await encryptPassword(password);
+
     const user = await prisma.user.create({
       data: {
         username,
+        name,
         email,
-        password,
-        avatar: "default-avatar.jpg",
+        password: hashedPassword,
+        // @ts-ignore
+        role,
       },
     });
 
@@ -82,7 +87,8 @@ export const signInController: RequestHandler = async (
       return;
     }
 
-    if (user.password !== password) {
+    const comparedPassword = await comparePassword(password, user.password);
+    if (!comparedPassword) {
       res.status(400).json({ error: "Incorrect password" });
       return;
     }

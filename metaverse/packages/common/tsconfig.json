@@ -5,5 +5,9 @@
     "compilerOptions": {
       "rootDir": "./src",
       "outDir": "./dist"
+    },
+    "paths": {
+      "@repo/db": ["packages/db"],
+      // "@repo/common": ["packages/common"]
     }
 }
