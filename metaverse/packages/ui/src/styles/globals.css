@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 74 56% 98%;
+    --foreground: 74 56% 3%;
+
+    --muted: 44 34% 85%;
+    --muted-foreground: 44 8% 34%;
+
+    --popover: 74 56% 97%;
+    --popover-foreground: 74 56% 2%;
+    --card: 74 56% 97%;
+    --card-foreground: 74 56% 2%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    
+    --primary: 74 53% 85%;
+    --primary-foreground: 74 53% 5%;
+
+    --secondary: 44 53% 85%;
+    --secondary-foreground: 44 53% 25%;
+    
+    --accent: 104 53% 85%;
+    --accent-foreground: 104 53% 5%;
+
+    --destructive: 2 81% 25%;
+    --destructive-foreground: 2 81% 85%;
+
+    --ring: 74 53% 85%;
+    --chart-1: 74 53% 85%;
+    --chart-2: 44 53% 85%;
+    --chart-3: 104 53% 85%;
+    --chart-4: 44 53% 88%;
+    --chart-5: 74 56% 85%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 74 31% 1%;
+    --foreground: 74 38% 98%;
+
+    --muted: 44 34% 15%;
+    --muted-foreground: 44 8% 66%;
+
+    --popover: 74 31% 2%;
+    --popover-foreground: 74 38% 99%;
+    --card: 74 31% 2%;
+    --card-foreground: 74 38% 99%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    
+    --primary: 74 53% 85%;
+    --primary-foreground: 74 53% 5%;
+
+    --secondary: 44 53% 85%;
+    --secondary-foreground: 44 53% 25%;
+    
+    --accent: 104 53% 85%;
+    --accent-foreground: 104 53% 5%;
+
+    --destructive: 2 81% 57%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --ring: 74 53% 85%;
+    --chart-1: 74 53% 85%;
+    --chart-2: 44 53% 85%;
+    --chart-3: 104 53% 85%;
+    --chart-4: 44 53% 88%;
+    --chart-5: 74 56% 85%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    padding: 0;
+    margin: 0;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply text-foreground;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgb(var(--background-end-rgb))
+      )
+      rgb(var(--background-start-rgb));
+  }
+}
+
+.gradient {
+  background-image: conic-gradient(
+    rgb(157, 23, 77),
+    rgb(107, 33, 168),
+    rgb(55, 48, 163)
+  );
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

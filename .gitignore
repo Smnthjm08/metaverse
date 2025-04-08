@@ -1,0 +1,11 @@
+# Environment configuration
+**/.env
+
+.turbo
+
+# VS Code Configuration
+**/.vscode/
+
+**/node_modules
+
+.DS_Store
