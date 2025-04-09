@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "../components/providers/theme-provider";
 import AppBar from "../components/globals/appbar";
+import { Toaster } from "@ui/components/ui/sonner";
 
 // const inter = Inter({ subsets: ["latin"] });
 const luckiestGuy = Inter({ subsets: ["latin"], weight: "400" });
@@ -26,8 +27,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <AppBar /> */}
+          <AppBar />
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

@@ -1,11 +1,15 @@
 import { signUpSchema, signInSchema } from "@repo/common/auth";
-import jwt from "jsonwebtoken";
 import { prisma } from "@repo/db/client";
 import { Request, Response, RequestHandler } from "express";
-import { comparePassword, encryptPassword } from "../utils/auth.utils";
+import jwt from "jsonwebtoken";
+import {
+  comparePassword,
+  encryptPassword,
+  generateAccessToken,
+  generateRefreshToken,
+  userTypes,
+} from "../utils/auth.utils";
 import { envConfig } from "../configs/env";
-
-const JWT_SECRET = envConfig.JWT_SECRET;
 
 export const signUpController: RequestHandler = async (
   req: Request,
@@ -49,11 +53,29 @@ export const signUpController: RequestHandler = async (
       },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-      expiresIn: "1h",
+    // Generate both access and refresh tokens
+    const accessToken = generateAccessToken({
+      id: user.id,
+      email: user.email,
     });
 
-    res.status(201).json({ token, user });
+    const refreshToken = generateRefreshToken({
+      id: user.id,
+      email: user.email,
+    });
+
+    res.status(201).json({
+      message: "Signed Up Successfully",
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -93,11 +115,88 @@ export const signInController: RequestHandler = async (
       return;
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
-      expiresIn: "1h",
+    // Generate both access and refresh tokens
+    const accessToken = generateAccessToken({
+      id: user.id,
+      email: user.email,
     });
 
-    res.status(200).json({ message: "Sign-in successful", token });
+    const refreshToken = generateRefreshToken({
+      id: user.id,
+      email: user.email,
+    });
+
+    res.status(200).json({
+      message: "Signed in Successfully",
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const refreshTokenController: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    //refresh token from request body, headers, or cookies
+    const refreshToken =
+      req.body.refreshToken ||
+      req.headers.authorization?.split(" ")[1] ||
+      req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      res.status(401).json({ error: "Refresh token is required" });
+      return;
+    }
+
+    // Verify the refresh token
+    jwt.verify(
+      refreshToken,
+      envConfig.JWT_SECRET,
+      async (err: any, decoded: any) => {
+        if (err) {
+          return res
+            .status(403)
+            .json({ error: "Invalid or expired refresh token" });
+        }
+
+        try {
+          // Get user from database to ensure they still exist and are authorized
+          const user = await prisma.user.findUnique({
+            where: { id: decoded.id },
+          });
+
+          if (!user) {
+            return res.status(403).json({ error: "User not found" });
+          }
+
+          // Generate new access token
+          const newAccessToken = generateAccessToken({
+            id: user.id,
+            email: user.email,
+          });
+
+          // Return the new access token
+          res.status(200).json({
+            accessToken: newAccessToken,
+          });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: "Internal Server Error" });
+        }
+      }
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });

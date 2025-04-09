@@ -1,18 +1,22 @@
 import "dotenv/config";
-
+import morgan from "morgan";
 import express, { Router } from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes";
 
 const app = express();
 app.use(express.json());
+app.use(morgan("tiny"));
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: "http://localhost:3001", // Replace with your frontend's URL
-  methods: "GET,POST,PUT,DELETE",
-  allowedHeaders: "Content-Type,Authorization",
-  credentials: true, // If using cookies or authentication
-}));
+
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+  })
+);
 // app.use(cookieParser());
 
 const v1Route = Router();

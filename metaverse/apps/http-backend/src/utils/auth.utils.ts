@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { envConfig } from "../configs/env";
 
 export interface userTypes {
-  id: number;
+  id: string;
   email: string;
 }
 

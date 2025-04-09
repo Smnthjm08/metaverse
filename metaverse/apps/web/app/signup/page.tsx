@@ -14,25 +14,32 @@ import { Label } from "@ui/components/ui/label";
 import Link from "next/link";
 import { signUpSchema } from "@repo/common/auth";
 import axios from "axios";
+import { toast } from "@ui/components/ui/sonner";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+    console.log("dwcwds");
+
     try {
-      // Validate the form data
       const validatedData = signUpSchema.safeParse({
         username: username,
         email: email,
+        name: name,
         password: password,
+        role: "admin",
       });
-      
+      console.log("dwcwdssdcdsc");
+
       if (!validatedData.success) {
         const formattedErrors: Record<string, string> = {};
         validatedData.error.errors.forEach((error) => {
@@ -40,18 +47,23 @@ export default function SignUpPage() {
           formattedErrors[path] = error.message;
         });
         setErrors(formattedErrors);
+        router.push("/dashboard");
+        console.log("eerr", errors);
         return;
       }
-      
-      // If validation succeeds, make API call
+
+      console.log("dwcwwsdefrgthyjhtgrfedsds");
+
       const response = await axios.post(
         "http://localhost:5001/api/v1/auth/signup",
-        { username, email, password }
+        { username, email, name, password, role: "admin" }
       );
-      
-      console.log("response", response);
+
+      console.log("response", response?.data?.error);
+      router.push("/dashboard");
+      toast.success(response?.data?.message);
     } catch (error) {
-      console.log(error);
+      console.log("error", error);
     }
   };
 
@@ -63,7 +75,7 @@ export default function SignUpPage() {
             <CardHeader>
               <CardTitle className="text-2xl text-center">Sign Up</CardTitle>
               <CardDescription className="text-center">
-                Sign Up with Email and Password
+                Create an account using your email
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -97,6 +109,20 @@ export default function SignUpPage() {
 
                   <div className="grid gap-2">
                     <div className="flex items-center">
+                      <Label htmlFor="username">Name</Label>
+                    </div>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="johndoe123"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <div className="flex items-center">
                       <Label htmlFor="password">Password</Label>
                     </div>
                     <Input
@@ -110,16 +136,17 @@ export default function SignUpPage() {
                   </div>
 
                   <Button type="submit" className="w-full">
-                    Login
+                    Signup
                   </Button>
                   <Button variant="outline" type="button" className="w-full">
                     Login with Google
                   </Button>
                 </div>
+
                 <div className="mt-4 text-center text-sm">
-                  Don&apos;t have an account?{" "}
-                  <Link href="/signup" className="underline underline-offset-4">
-                    Sign up
+                  Already have an account ?
+                  <Link href="/signin" className="underline underline-offset-4">
+                    Sign In
                   </Link>
                 </div>
               </form>
