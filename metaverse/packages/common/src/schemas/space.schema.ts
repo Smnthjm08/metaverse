@@ -1,9 +1,11 @@
 import z from "zod";
 
 export const spaceSchema = z.object({
-  name: z.string().min(2, { message: "Atleast 2 character needed" }),
-  width: z.number(),
-  height: z.number(),
-  thumbnail: z.string().optional(),
-  creatorId: z.string(),
+  id: z.string().optional(),
+  name: z.string().min(2),
+  width: z.number().min(1),
+  height: z.number().min(1),
+  capacity: z.number().min(1),
+  thumbnail: z.string().url().optional(),
 });
+

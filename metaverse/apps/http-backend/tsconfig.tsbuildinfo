@@ -1,11 +1,1 @@
-{
-    "root": [
-        "./src/index.ts",
-        "./src/controllers/authcontrollers.ts",
-        "./src/controllers/roomcontrollers.ts",
-        "./src/middlewares/authmiddleware.ts",
-        "./src/routes/authroutes.ts",
-        "./src/routes/roomroutes.ts"
-    ],
-    "version": "5.6.2"
-}
+{"root":["./src/index.ts","./src/configs/env.ts","./src/controllers/auth.controller.ts","./src/controllers/index.controller.ts","./src/controllers/space.controller.ts","./src/controllers/user.controller.ts","./src/middlewares/auth.middleware.ts","./src/routes/auth.routes.ts","./src/routes/chat.routes.ts","./src/routes/index.routes.ts","./src/routes/space.routes.ts","./src/routes/user.routes.ts","./src/utils/auth.utils.ts"],"version":"5.8.3"}

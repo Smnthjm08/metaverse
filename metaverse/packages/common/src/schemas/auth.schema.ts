@@ -11,6 +11,7 @@ export const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   avatar: z.string().optional(),
+  avatarId: z.number().optional(),
   role: z.enum(["admin", "user"]),
 });
 

@@ -48,6 +48,7 @@ export const signUpController: RequestHandler = async (
         name,
         email,
         password: hashedPassword,
+        avatarId: avatar ?? 1,
         // @ts-ignore
         role,
       },
@@ -74,6 +75,7 @@ export const signUpController: RequestHandler = async (
         email: user.email,
         name: user.name,
         role: user.role,
+        avatarId: user.avatarId,
       },
     });
   } catch (error) {

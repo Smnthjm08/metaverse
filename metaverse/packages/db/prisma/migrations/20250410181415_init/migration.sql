@@ -1,23 +1,24 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('Admin', 'User');
+CREATE TYPE "Role" AS ENUM ('admin', 'user');
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "username" TEXT,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" "Role" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "avatarId" TEXT NOT NULL,
+    "avatarId" INTEGER,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Avatar" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "imageUrl" TEXT,
     "name" TEXT,
 
@@ -31,6 +32,7 @@ CREATE TABLE "Space" (
     "width" INTEGER NOT NULL,
     "height" INTEGER,
     "thumbnail" TEXT,
+    "capacity" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "creatorId" TEXT NOT NULL,
@@ -65,6 +67,7 @@ CREATE TABLE "Map" (
     "width" INTEGER NOT NULL,
     "height" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
+    "maxCapacity" INTEGER NOT NULL,
 
     CONSTRAINT "Map_pkey" PRIMARY KEY ("id")
 );
@@ -105,7 +108,7 @@ CREATE UNIQUE INDEX "Map_id_key" ON "Map"("id");
 CREATE UNIQUE INDEX "MapElements_id_key" ON "MapElements"("id");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "Avatar"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "Avatar"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Space" ADD CONSTRAINT "Space_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

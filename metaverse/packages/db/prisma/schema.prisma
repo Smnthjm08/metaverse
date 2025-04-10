@@ -32,12 +32,12 @@ model User {
 
   space Space[]
 
-  avatarId String?
+  avatarId Int?
   avatar   Avatar? @relation(fields: [avatarId], references: [id])
 }
 
 model Avatar {
-  id       String  @id @unique @default(cuid())
+  id       Int     @id @unique @default(autoincrement())
   imageUrl String?
   name     String?
   users    User[]
@@ -49,6 +49,7 @@ model Space {
   width     Int
   height    Int?
   thumbnail String?
+  capacity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 
@@ -81,10 +82,11 @@ model Element {
 }
 
 model Map {
-  id     String @id @unique @default(cuid())
-  width  Int
-  height Int
-  name   String
+  id          String @id @unique @default(cuid())
+  width       Int
+  height      Int
+  name        String
+  maxCapacity Int
 
   mapElements MapElements[]
 }
