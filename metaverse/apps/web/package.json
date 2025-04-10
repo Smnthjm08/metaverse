@@ -23,7 +23,6 @@
     "@repo/common": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/ui": "workspace:*",
     "@types/eslint": "^9.6.1",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
