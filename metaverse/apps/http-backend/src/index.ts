@@ -3,6 +3,10 @@ import morgan from "morgan";
 import express, { Router } from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import { authMiddleware } from "./middlewares/auth.middleware";
+import spaceRoutes from "./routes/space.routes";
+import { getAvailableAvatars } from "./controllers/index.controller";
 
 const app = express();
 app.use(express.json());
@@ -24,6 +28,12 @@ const v1Route = Router();
 app.use("/api/v1", v1Route);
 
 v1Route.use("/auth", authRoutes);
+// @ts-ignore
+v1Route.use("/user", authMiddleware, userRoutes);
+// @ts-ignore
+v1Route.use("/space", authMiddleware, spaceRoutes);
+// @ts-ignore
+v1Route.use("/avatar", authMiddleware, getAvailableAvatars);
 
 const PORT = 5001;
 

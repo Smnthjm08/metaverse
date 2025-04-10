@@ -47,7 +47,6 @@ export default function SignUpPage() {
           formattedErrors[path] = error.message;
         });
         setErrors(formattedErrors);
-        router.push("/dashboard");
         console.log("eerr", errors);
         return;
       }
@@ -60,7 +59,7 @@ export default function SignUpPage() {
       );
 
       console.log("response", response?.data?.error);
-      router.push("/dashboard");
+      router.push("/profile");
       toast.success(response?.data?.message);
     } catch (error) {
       console.log("error", error);

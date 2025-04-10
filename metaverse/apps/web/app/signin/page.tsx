@@ -49,7 +49,7 @@ export default function SignInPage() {
         validatedData
       );
       console.log("response", response);
-      router.push("/dashboard");
+      router.push("/profile");
       toast.success(response?.data?.message);
 
       console.log("Validated data:", validatedData);
