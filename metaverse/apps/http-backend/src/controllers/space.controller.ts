@@ -51,12 +51,11 @@ export const createSpaceController = async (
         .json({ error: "Invalid data", details: parsedData.error.format() });
       return;
     }
-    const { name, width, height, thumbnail, capacity } = parsedData?.data;
+    const { name, dimensions, thumbnail, capacity } = parsedData?.data;
 
     const space = await prisma.space.create({
       name,
-      width,
-      height,
+      dimensions,
       thumbnail,
       capacity,
       // @ts-ignore

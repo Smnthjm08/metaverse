@@ -27,6 +27,10 @@ const v1Route = Router();
 
 app.use("/api/v1", v1Route);
 
+v1Route.get("/", (req, res) => {
+  res.json("Backend is working fine");
+});
+
 v1Route.use("/auth", authRoutes);
 // @ts-ignore
 v1Route.use("/user", authMiddleware, userRoutes);

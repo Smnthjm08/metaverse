@@ -46,8 +46,9 @@ model Avatar {
 model Space {
   id        String   @id @unique @default(cuid())
   name      String
-  width     Int
-  height    Int?
+  // width     Int
+  // height    Int?
+  dimesions String
   thumbnail String?
   capacity  Int
   createdAt DateTime @default(now())
@@ -76,6 +77,7 @@ model Element {
   width    Int
   height   Int
   imageUrl String
+  static Boolean
 
   spaces      SpaceElements[]
   mapElements MapElements[]

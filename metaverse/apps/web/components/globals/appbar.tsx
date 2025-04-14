@@ -9,8 +9,8 @@ export default function AppBar() {
 
   return (
     <nav className="w-full z-50 h-16 flex items-center justify-between px-6 shadow-md border-b-2 fixed top-0">
-      <div className="font-bold font-serif text-xl tracking-tight">
-        excaildraw
+      <div className="font-bold font-sans text-xl tracking-tight">
+        metaverse
       </div>
 
       <div className="flex gap-4">
