@@ -10,3 +10,4 @@ const getEnv = (key: string, defautValue?: string):string=>{
 }
 
 export const JWT_SECRET = getEnv("JWT_SECRET");
+export const FRONTEND_ORIGIN = getEnv("FRONTEND_ORIGIN");

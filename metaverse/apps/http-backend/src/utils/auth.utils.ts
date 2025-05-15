@@ -7,8 +7,8 @@ export interface userTypes {
   email: string;
 }
 
-export const encryptPassword = (password: string) => {
-  return bcrypt.hash(password, 10);
+export const encryptPassword = (password: string, saltRounds: number) => {
+  return bcrypt.hash(password, saltRounds || 10);
 };
 
 export const comparePassword = (plain: string, hashed: string) => {

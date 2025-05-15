@@ -10,77 +10,70 @@ import {
   userTypes,
 } from "../utils/auth.utils";
 import { JWT_SECRET } from "../configs/env";
+import {
+  BAD_REQUEST,
+  CREATED,
+  INTERNAL_SERVER_ERROR,
+  OK,
+} from "../constants/http";
 
 export const signUpController: RequestHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const parsedData = signUpSchema.safeParse(req.body);
+    // validate request
+    const parsedData = signUpSchema.safeParse({
+      ...req.body,
+      userAgent: req.headers["user-agent"],
+    });
 
     if (!parsedData.success) {
       res
-        .status(400)
+        .status(BAD_REQUEST)
         .json({ error: "Invalid data", details: parsedData.error.format() });
       return;
     }
 
-    const { username, name, email, password, avatar } = parsedData.data;
+    res.status(OK).json({ parsedData });
 
-    const userExists = await prisma.user.findFirst({
-      where: {
-        OR: [{ username }, { email }],
-      },
-    });
+    // const hashedPassword = await encryptPassword(password);
 
-    if (userExists) {
-      res
-        .status(400)
-        .json({ error: "User with this email/username already exists" });
-      return;
-    }
+    // const user = await prisma.user.create({
+    //   data: {
+    //     username,
+    //     email,
+    //     password: hashedPassword,
+    //   },
+    // });
 
-    const hashedPassword = await encryptPassword(password);
+    // // Generate both access and refresh tokens
+    // const accessToken = generateAccessToken({
+    //   id: user.id,
+    //   email: user.email,
+    // });
 
-    const user = await prisma.user.create({
-      data: {
-        username,
-        name,
-        email,
-        password: hashedPassword,
-        avatarId: avatar ?? 1,
-        // @ts-ignore
-        role,
-      },
-    });
+    // const refreshToken = generateRefreshToken({
+    //   id: user.id,
+    //   email: user.email,
+    // });
 
-    // Generate both access and refresh tokens
-    const accessToken = generateAccessToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    const refreshToken = generateRefreshToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    res.status(201).json({
-      message: "Signed Up Successfully",
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        avatarId: user.avatarId,
-      },
-    });
+    // res.status(CREATED).json({
+    //   message: "Signed Up Successfully",
+    //   accessToken,
+    //   refreshToken,
+    //   user: {
+    //     id: user.id,
+    //     username: user.username,
+    //     email: user.email,
+    //     name: user.name,
+    //     // role: user.role,
+    //     avatarId: user.avatarId,
+    //   },
+    // });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 };
 
@@ -92,7 +85,7 @@ export const signInController: RequestHandler = async (
 
   if (!parsedData.success) {
     res
-      .status(400)
+      .status(BAD_REQUEST)
       .json({ error: "Invalid data", details: parsedData.error.format() });
     return;
   }
@@ -107,13 +100,13 @@ export const signInController: RequestHandler = async (
     });
 
     if (!user) {
-      res.status(400).json({ error: "User not found" });
+      res.status(BAD_REQUEST).json({ error: "User not found" });
       return;
     }
 
     const comparedPassword = await comparePassword(password, user.password);
     if (!comparedPassword) {
-      res.status(400).json({ error: "Incorrect password" });
+      res.status(BAD_REQUEST).json({ error: "Incorrect password" });
       return;
     }
 
@@ -128,7 +121,7 @@ export const signInController: RequestHandler = async (
       email: user.email,
     });
 
-    res.status(200).json({
+    res.status(OK).json({
       message: "Signed in Successfully",
       accessToken,
       refreshToken,
@@ -137,7 +130,7 @@ export const signInController: RequestHandler = async (
         username: user.username,
         email: user.email,
         name: user.name,
-        role: user.role,
+        // role: user.role,
       },
     });
   } catch (error) {
@@ -163,42 +156,38 @@ export const refreshTokenController: RequestHandler = async (
     }
 
     // Verify the refresh token
-    jwt.verify(
-      refreshToken,
-      JWT_SECRET,
-      async (err: any, decoded: any) => {
-        if (err) {
-          return res
-            .status(403)
-            .json({ error: "Invalid or expired refresh token" });
-        }
-
-        try {
-          // Get user from database to ensure they still exist and are authorized
-          const user = await prisma.user.findUnique({
-            where: { id: decoded.id },
-          });
-
-          if (!user) {
-            return res.status(403).json({ error: "User not found" });
-          }
-
-          // Generate new access token
-          const newAccessToken = generateAccessToken({
-            id: user.id,
-            email: user.email,
-          });
-
-          // Return the new access token
-          res.status(200).json({
-            accessToken: newAccessToken,
-          });
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: "Internal Server Error" });
-        }
+    jwt.verify(refreshToken, JWT_SECRET, async (err: any, decoded: any) => {
+      if (err) {
+        return res
+          .status(403)
+          .json({ error: "Invalid or expired refresh token" });
       }
-    );
+
+      try {
+        // Get user from database to ensure they still exist and are authorized
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.id },
+        });
+
+        if (!user) {
+          return res.status(403).json({ error: "User not found" });
+        }
+
+        // Generate new access token
+        const newAccessToken = generateAccessToken({
+          id: user.id,
+          email: user.email,
+        });
+
+        // Return the new access token
+        res.status(OK).json({
+          accessToken: newAccessToken,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });

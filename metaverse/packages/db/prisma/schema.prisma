@@ -20,20 +20,36 @@ enum Role {
   user
 }
 
+enum VerificationCodeType {
+  email
+  password
+}
+
 model User {
-  id        String   @id @unique @default(cuid())
-  name      String
-  username  String?
+  id        String   @id @default(cuid())
+  name      String?
+  username  String   @unique
   email     String   @unique
   password  String
-  // role      Role
+  verified  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 
-  space Space[]
+  space             Space[]
+  verificationCodes VerificationCode[]
 
-  avatarId Int?
+  avatarId Int?    @default(1)
   avatar   Avatar? @relation(fields: [avatarId], references: [id])
+}
+
+model VerificationCode {
+  id   Int                  @id @default(autoincrement())
+  type VerificationCodeType
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 model Avatar {
@@ -73,11 +89,11 @@ model SpaceElements {
 }
 
 model Element {
-  id       String @id @unique @default(cuid())
+  id       String  @id @unique @default(cuid())
   width    Int
   height   Int
   imageUrl String
-  static Boolean
+  static   Boolean
 
   spaces      SpaceElements[]
   mapElements MapElements[]

@@ -3,42 +3,42 @@ import morgan from "morgan";
 import express, { Router } from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes";
-import userRoutes from "./routes/user.routes";
-import { authMiddleware } from "./middlewares/auth.middleware";
-import spaceRoutes from "./routes/space.routes";
-import { getAvailableAvatars } from "./controllers/index.controller";
+import { FRONTEND_ORIGIN } from "./configs/env";
+import cookieParser from "cookie-parser";
+import errorHandler from "./middlewares/error.middleware";
+import { OK } from "./constants/http";
 
 const app = express();
 app.use(express.json());
-app.use(morgan("tiny"));
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan("tiny"));
 
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: FRONTEND_ORIGIN,
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,
   })
 );
-// app.use(cookieParser());
+app.use(cookieParser());
 
 const v1Route = Router();
 
 app.use("/api/v1", v1Route);
 
-v1Route.get("/", (req, res) => {
-  res.status(200).json({ message: "Backend is working fine" });
+v1Route.get("/", async (req, res, next) => {
+  try {
+    throw new Error("This is an unhanded Error");
+    res.status(OK).json({ message: "Backend is working fine" });
+  } catch (error) {
+    next(error);
+  }
 });
 
 v1Route.use("/auth", authRoutes);
-// @ts-ignore
-v1Route.use("/user", authMiddleware, userRoutes);
-// @ts-ignore
-v1Route.use("/space", authMiddleware, spaceRoutes);
-// @ts-ignore
-v1Route.use("/avatar", authMiddleware, getAvailableAvatars);
 
+app.use(errorHandler);
 const PORT = 5001;
 
 app

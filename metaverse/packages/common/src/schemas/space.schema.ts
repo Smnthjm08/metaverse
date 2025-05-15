@@ -6,7 +6,7 @@ export const spaceSchema = z.object({
   // width: z.number().min(1),
   // height: z.number().min(1),
   mapId: z.string(),
-  dimensions: z
+  dimesions: z
     .string()
     .regex(
       /^\d{1,4}x\d{1,4}$/,

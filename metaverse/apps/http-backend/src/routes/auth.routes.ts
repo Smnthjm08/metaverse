@@ -5,6 +5,7 @@ import {
   signUpController,
 } from "../controllers/auth.controller";
 
+// /v1/auth
 const authRoutes: Router = Router();
 
 authRoutes.post("/signup", signUpController);

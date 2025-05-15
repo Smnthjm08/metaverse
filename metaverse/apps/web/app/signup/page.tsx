@@ -36,7 +36,7 @@ export default function SignUpPage() {
         email: email,
         name: name,
         password: password,
-        role: "admin",
+        // role: "admin",
       });
       console.log("dwcwdssdcdsc");
 
