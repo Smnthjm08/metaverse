@@ -55,7 +55,7 @@ export default function SignUpPage() {
 
       const response = await axios.post(
         "http://localhost:5001/api/v1/auth/signup",
-        { username, email, name, password, role: "admin" }
+        { username, email, name, password }
       );
 
       console.log("response", response?.data?.error);

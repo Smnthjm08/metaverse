@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { envConfig } from "../configs/env";
+import { JWT_SECRET } from "../configs/env";
 
 export interface userTypes {
   id: string;
@@ -16,11 +16,11 @@ export const comparePassword = (plain: string, hashed: string) => {
 };
 
 export const generateAccessToken = (user: userTypes) => {
-  return jwt.sign({ id: user.id, email: user.email }, envConfig.JWT_SECRET, {
+  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
     expiresIn: "40m",
   });
 };
 
 export const generateRefreshToken = (user: userTypes) => {
-  return jwt.sign({ id: user.id }, envConfig.JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
 };

@@ -9,7 +9,7 @@ import {
   generateRefreshToken,
   userTypes,
 } from "../utils/auth.utils";
-import { envConfig } from "../configs/env";
+import { JWT_SECRET } from "../configs/env";
 
 export const signUpController: RequestHandler = async (
   req: Request,
@@ -25,7 +25,7 @@ export const signUpController: RequestHandler = async (
       return;
     }
 
-    const { username, name, email, password, role, avatar } = parsedData.data;
+    const { username, name, email, password, avatar } = parsedData.data;
 
     const userExists = await prisma.user.findFirst({
       where: {
@@ -165,7 +165,7 @@ export const refreshTokenController: RequestHandler = async (
     // Verify the refresh token
     jwt.verify(
       refreshToken,
-      envConfig.JWT_SECRET,
+      JWT_SECRET,
       async (err: any, decoded: any) => {
         if (err) {
           return res
