@@ -4,10 +4,8 @@ import { Request, Response, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import {
   comparePassword,
-  encryptPassword,
   generateAccessToken,
   generateRefreshToken,
-  userTypes,
 } from "../utils/auth.utils";
 import { JWT_SECRET } from "../configs/env";
 import {
@@ -16,6 +14,8 @@ import {
   INTERNAL_SERVER_ERROR,
   OK,
 } from "../constants/http";
+import { createAccount } from "../services/auth.services";
+import { setAuthCookies } from "../utils/cookies";
 
 export const signUpController: RequestHandler = async (
   req: Request,
@@ -35,44 +35,26 @@ export const signUpController: RequestHandler = async (
       return;
     }
 
-    res.status(OK).json({ parsedData });
+    const { user, accessToken, refreshToken } = await createAccount(parsedData.data);
 
-    // const hashedPassword = await encryptPassword(password);
-
-    // const user = await prisma.user.create({
-    //   data: {
-    //     username,
-    //     email,
-    //     password: hashedPassword,
-    //   },
-    // });
-
-    // // Generate both access and refresh tokens
-    // const accessToken = generateAccessToken({
-    //   id: user.id,
-    //   email: user.email,
-    // });
-
-    // const refreshToken = generateRefreshToken({
-    //   id: user.id,
-    //   email: user.email,
-    // });
-
-    // res.status(CREATED).json({
-    //   message: "Signed Up Successfully",
-    //   accessToken,
-    //   refreshToken,
-    //   user: {
-    //     id: user.id,
-    //     username: user.username,
-    //     email: user.email,
-    //     name: user.name,
-    //     // role: user.role,
-    //     avatarId: user.avatarId,
-    //   },
-    // });
+    setAuthCookies({ res, accessToken, refreshToken })
+      .status(CREATED)
+      .json(user);
   } catch (error) {
     console.error(error);
+    
+    // Handle specific errors
+    if (error instanceof Error) {
+      if (error.message === "User already exists!") {
+        res.status(BAD_REQUEST).json({ error: error.message });
+        return;
+      }
+      if (error.message === "Password needs to be string") {
+        res.status(BAD_REQUEST).json({ error: error.message });
+        return;
+      }
+    }
+    
     res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 };

@@ -1,19 +1,43 @@
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('admin', 'user');
 
+-- CreateEnum
+CREATE TYPE "VerificationCodeType" AS ENUM ('email', 'password');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "username" TEXT,
+    "name" TEXT,
+    "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
+    "verified" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "avatarId" INTEGER,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "VerificationCode" (
+    "id" TEXT NOT NULL,
+    "type" "VerificationCodeType" NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "VerificationCode_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Sessions" (
+    "id" SERIAL NOT NULL,
+    "userAgent" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "Sessions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -29,8 +53,7 @@ CREATE TABLE "Avatar" (
 CREATE TABLE "Space" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "width" INTEGER NOT NULL,
-    "height" INTEGER,
+    "dimesions" TEXT NOT NULL,
     "thumbnail" TEXT,
     "capacity" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -57,6 +80,7 @@ CREATE TABLE "Element" (
     "width" INTEGER NOT NULL,
     "height" INTEGER NOT NULL,
     "imageUrl" TEXT NOT NULL,
+    "static" BOOLEAN NOT NULL,
 
     CONSTRAINT "Element_pkey" PRIMARY KEY ("id")
 );
@@ -84,7 +108,7 @@ CREATE TABLE "MapElements" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
@@ -108,7 +132,10 @@ CREATE UNIQUE INDEX "Map_id_key" ON "Map"("id");
 CREATE UNIQUE INDEX "MapElements_id_key" ON "MapElements"("id");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "Avatar"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "VerificationCode" ADD CONSTRAINT "VerificationCode_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sessions" ADD CONSTRAINT "Sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Space" ADD CONSTRAINT "Space_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

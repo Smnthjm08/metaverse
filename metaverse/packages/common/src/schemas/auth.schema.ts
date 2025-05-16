@@ -13,9 +13,7 @@ export const signUpSchema = z
     password: z.string().min(6),
     confirmPassword: z.string().min(6),
     userAgent: z.string().optional(),
-    // avatar: z.string().optional(),
-    // avatarId: z.number().optional(),
-    role: z.enum(["admin", "user"]).optional(),
+    avatarId: z.number().optional()
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
