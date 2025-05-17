@@ -13,7 +13,7 @@ import {
   CREATED,
   INTERNAL_SERVER_ERROR,
   OK,
-} from "../constants/http";
+} from "../constants/http-status.code";
 import { createAccount } from "../services/auth.services";
 import { setAuthCookies } from "../utils/cookies";
 
@@ -42,14 +42,15 @@ export const signUpController: RequestHandler = async (
       .json(user);
   } catch (error) {
     console.error(error);
-    
     // Handle specific errors
     if (error instanceof Error) {
       if (error.message === "User already exists!") {
+        console.log("error at opas", error)
         res.status(BAD_REQUEST).json({ error: error.message });
         return;
       }
       if (error.message === "Password needs to be string") {
+                console.log("error at Password", error)
         res.status(BAD_REQUEST).json({ error: error.message });
         return;
       }

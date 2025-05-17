@@ -6,12 +6,12 @@ import authRoutes from "./routes/auth.routes";
 import { FRONTEND_ORIGIN } from "./configs/env";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error.middleware";
-import { OK } from "./constants/http";
+import { OK } from "./constants/http-status.code";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("tiny"));
+// app.use(morgan("tiny"));
 
 app.use(
   cors({
@@ -29,7 +29,6 @@ app.use("/api/v1", v1Route);
 
 v1Route.get("/", async (req, res, next) => {
   try {
-    throw new Error("This is an unhanded Error");
     res.status(OK).json({ message: "Backend is working fine" });
   } catch (error) {
     next(error);

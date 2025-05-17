@@ -16,13 +16,13 @@
     --card-foreground: 74 56% 2%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    
+
     --primary: 74 53% 85%;
     --primary-foreground: 74 53% 5%;
 
     --secondary: 44 53% 85%;
     --secondary-foreground: 44 53% 25%;
-    
+
     --accent: 104 53% 85%;
     --accent-foreground: 104 53% 5%;
 
@@ -59,19 +59,19 @@
     --card-foreground: 74 38% 99%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    
+
     --primary: 74 53% 85%;
     --primary-foreground: 74 53% 5%;
 
     --secondary: 44 53% 85%;
     --secondary-foreground: 44 53% 25%;
-    
+
     --accent: 104 53% 85%;
     --accent-foreground: 104 53% 5%;
 
     --destructive: 2 81% 57%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --ring: 74 53% 85%;
     --chart-1: 74 53% 85%;
     --chart-2: 44 53% 85%;
@@ -121,8 +121,6 @@
   );
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -131,12 +129,6 @@
     @apply bg-background text-foreground;
   }
 }
-
-
-
-
-
-
 
 @layer base {
   * {

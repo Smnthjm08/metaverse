@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../configs/env";
 
-
 export interface AuthRequest extends Request {
   userId: string;
 }
@@ -16,22 +15,22 @@ export function authMiddleware(
   const token = authHeader?.startsWith("Bearer ")
     ? authHeader.replace("Bearer ", "")
     : authHeader;
-  
+
   if (!token) {
     return res.status(401).json({
       message: "Authentication required. Please provide a valid token.",
     });
   }
-  
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {
       id: string;
       email: string;
     };
-    
+
     // Add user ID to request object for use in route handlers
     (req as AuthRequest).userId = decoded.id;
-    
+
     next();
   } catch (err) {
     if ((err as Error).name === "TokenExpiredError") {
@@ -40,7 +39,7 @@ export function authMiddleware(
         code: "TOKEN_EXPIRED",
       });
     }
-    
+
     console.error("JWT verification failed:", err);
     next(err);
     return res.status(403).json({ message: "Invalid token" });

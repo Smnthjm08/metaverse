@@ -5,7 +5,7 @@ import { oneYearFromNow } from "../utils/date.utils";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../configs/env";
 import appAssert from "../utils/app-assert.utils";
-import { CONFLICT } from "../constants/http";
+import { CONFLICT } from "../constants/http-status.code";
 
 export type CreateAccountParams = {
   username: string;
@@ -18,17 +18,17 @@ export const createAccount = async (data: CreateAccountParams) => {
   // verify existing user doesn't exist
   const { username, email, password, userAgent } = data;
 
-  const userExists = await prisma.user.findFirst({
+  const existingUser = await prisma.user.findFirst({
     where: {
       OR: [{ username }, { email }],
     },
   });
 
-  // if (userExists) {
+  // if (existingUser) {
   //   throw new Error("User already exists!");
   // }
 
-  appAssert(!userExists, CONFLICT, "Email already in Use.");
+  appAssert(!existingUser, CONFLICT, "Email/username already in Use.");
 
   if (typeof password !== "string") {
     throw new Error("Password needs to be string");
@@ -80,8 +80,7 @@ export const createAccount = async (data: CreateAccountParams) => {
     audience: ["user"],
   });
 
-  // return user and token
-  // Exclude password from user object
+  // return user without password and token
   const { password: _password, ...userWithoutPassword } = user;
   return {
     user: userWithoutPassword,

@@ -3,7 +3,7 @@
  */
 import assert from "node:assert";
 import AppError from "./error.utils";
-import { HttpStatusCode } from "../constants/http";
+import { HttpStatusCode } from "../constants/http-status.code";
 import AppErrorCode from "../constants/error.code";
 
 type AppAssert = (
