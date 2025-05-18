@@ -7,6 +7,9 @@ import { FRONTEND_ORIGIN } from "./configs/env";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error.middleware";
 import { OK } from "./constants/http-status.code";
+import userRoutes from "./routes/user.routes";
+import authenticate from "./middlewares/auth.middleware";
+import sessionRoutes from "./routes/session.routes";
 
 const app = express();
 app.use(express.json());
@@ -36,6 +39,8 @@ v1Route.get("/", async (req, res, next) => {
 });
 
 v1Route.use("/auth", authRoutes);
+v1Route.use("/user", authenticate, userRoutes);
+v1Route.use("/session", authenticate, sessionRoutes);
 
 app.use(errorHandler);
 const PORT = 5001;

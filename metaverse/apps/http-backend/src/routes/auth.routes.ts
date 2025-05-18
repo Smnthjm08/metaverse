@@ -14,4 +14,6 @@ authRoutes.post("/signin", signInController);
 authRoutes.get("/logout", logoutController);
 authRoutes.get("/refresh", refreshTokenController);
 
+// TODO: email verification and the password reset is pending here
+
 export default authRoutes;
