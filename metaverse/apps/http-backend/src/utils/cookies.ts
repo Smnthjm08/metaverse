@@ -3,6 +3,8 @@ import { fifteenMinutesFromNow, thirtyDaysFromNow } from "./date.utils";
 
 const secure = process.env.NODE_ENV !== "dev";
 
+export const REFRESH_PATH = "api/vi/auth/refresh";
+
 const defaults: CookieOptions = {
   sameSite: "strict",
   httpOnly: true,
@@ -17,7 +19,7 @@ const getAccessTokenCookieOptions = (): CookieOptions => ({
 const getRefreshTokenCookieOptions = (): CookieOptions => ({
   ...defaults,
   expires: thirtyDaysFromNow(),
-  path: "/auth/refresh",
+  path: REFRESH_PATH,
 });
 
 export type Params = {
@@ -31,3 +33,9 @@ export const setAuthCookies = ({ res, accessToken, refreshToken }: Params) => {
     .cookie("accessToken", accessToken, getAccessTokenCookieOptions())
     .cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
 };
+
+export const clearAuthCookies = (res: Response) =>{
+  res.clearCookie("accessToken").clearCookie("refreshToken", {
+    path: REFRESH_PATH
+  });
+}

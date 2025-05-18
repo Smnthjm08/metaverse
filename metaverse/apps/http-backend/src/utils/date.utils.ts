@@ -1,4 +1,5 @@
 const oneDay = 24 * 60 * 60 * 1000;
+export const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
 
 export const oneYearFromNow = () => {
   const newDate = new Date(Date.now() + 365 * oneDay);
@@ -14,3 +15,4 @@ export const fifteenMinutesFromNow = () => {
   const newDate = new Date(Date.now() + 15 * 60 * 1000);
   return newDate;
 };
+

@@ -1,21 +1,17 @@
 import { signUpSchema, signInSchema } from "@repo/common/auth";
 import { prisma } from "@repo/db/client";
 import { Request, Response, RequestHandler } from "express";
-import jwt from "jsonwebtoken";
-import {
-  comparePassword,
-  generateAccessToken,
-  generateRefreshToken,
-} from "../utils/auth.utils";
-import { JWT_SECRET } from "../configs/env";
+import { verifyToken } from "../utils/auth.utils";
 import {
   BAD_REQUEST,
   CREATED,
   INTERNAL_SERVER_ERROR,
   OK,
+  UNAUTHORIZED,
 } from "../constants/http-status.code";
-import { createAccount } from "../services/auth.services";
-import { setAuthCookies } from "../utils/cookies";
+import { createUser, refreshUserAccessToken, signinUser } from "../services/auth.services";
+import { clearAuthCookies, setAuthCookies } from "../utils/cookies";
+import { fifteenMinutesFromNow, thirtyDaysFromNow } from "../utils/date.utils";
 
 export const signUpController: RequestHandler = async (
   req: Request,
@@ -35,7 +31,9 @@ export const signUpController: RequestHandler = async (
       return;
     }
 
-    const { user, accessToken, refreshToken } = await createAccount(parsedData.data);
+    const { user, accessToken, refreshToken } = await createUser(
+      parsedData.data
+    );
 
     setAuthCookies({ res, accessToken, refreshToken })
       .status(CREATED)
@@ -45,17 +43,17 @@ export const signUpController: RequestHandler = async (
     // Handle specific errors
     if (error instanceof Error) {
       if (error.message === "User already exists!") {
-        console.log("error at opas", error)
+        console.log("error at opas", error);
         res.status(BAD_REQUEST).json({ error: error.message });
         return;
       }
       if (error.message === "Password needs to be string") {
-                console.log("error at Password", error)
+        console.log("error at Password", error);
         res.status(BAD_REQUEST).json({ error: error.message });
         return;
       }
     }
-    
+
     res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 };
@@ -64,7 +62,10 @@ export const signInController: RequestHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const parsedData = signInSchema.safeParse(req.body);
+  const parsedData = signInSchema.safeParse({
+    ...req.body,
+    userAgent: req.headers["user-agent"],
+  });
 
   if (!parsedData.success) {
     res
@@ -73,53 +74,50 @@ export const signInController: RequestHandler = async (
     return;
   }
 
-  const { username, email, password } = parsedData.data;
+  const { accessToken, refreshToken } = await signinUser(parsedData?.data);
 
-  try {
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ username }, { email }],
-      },
-    });
+  setAuthCookies({ res, accessToken, refreshToken })
+    .status(CREATED)
+    .json({ message: "Login Successful" });
+};
 
-    if (!user) {
-      res.status(BAD_REQUEST).json({ error: "User not found" });
-      return;
+export const logoutController: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const accessToken = req.cookies.accessToken as string;
+
+  const { payload, error } = verifyToken(accessToken || "");
+
+  if (payload) {
+    console.log(">>>>");
+    console.log("payload\n", payload?.sessionId);
+    const sessionId = payload?.sessionId;
+
+    if (sessionId) {
+      try {
+        const existingSession = await prisma.sessions.findUnique({
+          where: { id: sessionId },
+        });
+
+        if (existingSession) {
+          await prisma.sessions.delete({
+            where: { id: sessionId },
+          });
+        } else {
+          console.warn(`No session found for id ${sessionId}, skipping delete.`);
+        }
+      } catch (err) {
+        console.error("Error deleting session:", err);
+        // return res.status(INTERNAL_SERVER_ERROR).json({ message: "Logout failed." });
+      }
     }
-
-    const comparedPassword = await comparePassword(password, user.password);
-    if (!comparedPassword) {
-      res.status(BAD_REQUEST).json({ error: "Incorrect password" });
-      return;
-    }
-
-    // Generate both access and refresh tokens
-    const accessToken = generateAccessToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    const refreshToken = generateRefreshToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    res.status(OK).json({
-      message: "Signed in Successfully",
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        name: user.name,
-        // role: user.role,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
   }
+
+  clearAuthCookies(res);
+  res.status(OK).json({
+    message: "Logout successful.",
+  });
 };
 
 export const refreshTokenController: RequestHandler = async (
@@ -127,52 +125,51 @@ export const refreshTokenController: RequestHandler = async (
   res: Response
 ): Promise<void> => {
   try {
-    //refresh token from request body, headers, or cookies
-    const refreshToken =
-      req.body.refreshToken ||
-      req.headers.authorization?.split(" ")[1] ||
-      req.cookies?.refreshToken;
-
-    if (!refreshToken) {
-      res.status(401).json({ error: "Refresh token is required" });
-      return;
+    // Check if refreshToken exists in cookies
+    const currentRefreshToken = req.cookies.refreshToken;
+    console.log("Cookies received:", req.cookies);
+    
+    if (!currentRefreshToken) {
+      console.log("No refresh token found in cookies");
+       res.status(UNAUTHORIZED).json({ message: "Missing Refresh Token" });
     }
-
-    // Verify the refresh token
-    jwt.verify(refreshToken, JWT_SECRET, async (err: any, decoded: any) => {
-      if (err) {
-        return res
-          .status(403)
-          .json({ error: "Invalid or expired refresh token" });
+    
+    console.log("Using refresh token:", currentRefreshToken);
+    
+    try {
+      // Await the refresh token function
+      const { accessToken, refreshToken } = await refreshUserAccessToken(currentRefreshToken);
+      
+      // Set the access token cookie
+      res.cookie("accessToken", accessToken, {
+        expires: fifteenMinutesFromNow(),
+        httpOnly: true,
+        sameSite: 'strict'
+      });
+      
+      // Set the refresh token cookie if a new one was generated
+      if (refreshToken) {
+        res.cookie("refreshToken", refreshToken, {
+          expires: thirtyDaysFromNow(),
+          httpOnly: true,
+          sameSite: 'strict'
+        });
       }
-
-      try {
-        // Get user from database to ensure they still exist and are authorized
-        const user = await prisma.user.findUnique({
-          where: { id: decoded.id },
-        });
-
-        if (!user) {
-          return res.status(403).json({ error: "User not found" });
-        }
-
-        // Generate new access token
-        const newAccessToken = generateAccessToken({
-          id: user.id,
-          email: user.email,
-        });
-
-        // Return the new access token
-        res.status(OK).json({
-          accessToken: newAccessToken,
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-      }
-    });
+      
+      // Send the response
+       res.status(OK).json({
+        message: "Access Token Refreshed",
+      });
+    } catch (tokenError) {
+      console.error("Token refresh error:", tokenError);
+       res.status(UNAUTHORIZED).json({ 
+        message: "Invalid or expired refresh token",
+        // @ts-ignore
+        error: tokenError.message 
+      });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Refresh controller error:", error);
+     res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  logoutController,
   refreshTokenController,
   signInController,
   signUpController,
@@ -10,6 +11,7 @@ const authRoutes: Router = Router();
 
 authRoutes.post("/signup", signUpController);
 authRoutes.post("/signin", signInController);
-authRoutes.post("/refresh", refreshTokenController);
+authRoutes.get("/logout", logoutController);
+authRoutes.get("/refresh", refreshTokenController);
 
 export default authRoutes;

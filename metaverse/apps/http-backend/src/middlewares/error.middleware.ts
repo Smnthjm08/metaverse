@@ -2,6 +2,7 @@ import { ErrorRequestHandler, Response } from "express";
 import z from "zod";
 import { BAD_REQUEST } from "../constants/http-status.code";
 import AppError from "../utils/error.utils";
+import { REFRESH_PATH } from "../utils/cookies";
 
 const handleZodError = (res: Response, error: z.ZodError) => {
   const errors = error.issues.map((err) => ({
@@ -25,6 +26,13 @@ const handleAppError = (res: Response, error: AppError) => {
 // @ts-ignore
 const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   console.log(`PATH: ${req.path}`, error);
+
+  if (req.path === REFRESH_PATH) {
+    res.status(401).json({
+      message: "Unauthorized",
+      errorCode: "UNAUTHORIZED",
+    });
+  }
 
   if (error instanceof z.ZodError) {
     return handleZodError(res, error);
