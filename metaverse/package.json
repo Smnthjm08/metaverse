@@ -6,8 +6,9 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "start": "pnpm run build && pnpm run dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md,prisma,js,html,css}\""
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

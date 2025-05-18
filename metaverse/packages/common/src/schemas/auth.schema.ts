@@ -25,3 +25,4 @@ export const signInSchema = z.object({
   email: z.string().email().optional(),
   password: z.string().min(6),
 });
+

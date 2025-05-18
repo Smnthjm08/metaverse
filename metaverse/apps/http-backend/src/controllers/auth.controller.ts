@@ -77,7 +77,7 @@ export const signInController: RequestHandler = async (
   const { accessToken, refreshToken } = await signinUser(parsedData?.data);
 
   setAuthCookies({ res, accessToken, refreshToken })
-    .status(CREATED)
+    .status(OK)
     .json({ message: "Login Successful" });
 };
 
@@ -90,8 +90,6 @@ export const logoutController: RequestHandler = async (
   const { payload, error } = verifyToken(accessToken || "");
 
   if (payload) {
-    console.log(">>>>");
-    console.log("payload\n", payload?.sessionId);
     const sessionId = payload?.sessionId;
 
     if (sessionId) {
@@ -127,15 +125,11 @@ export const refreshTokenController: RequestHandler = async (
   try {
     // Check if refreshToken exists in cookies
     const currentRefreshToken = req.cookies.refreshToken;
-    console.log("Cookies received:", req.cookies);
     
     if (!currentRefreshToken) {
-      console.log("No refresh token found in cookies");
        res.status(UNAUTHORIZED).json({ message: "Missing Refresh Token" });
     }
-    
-    console.log("Using refresh token:", currentRefreshToken);
-    
+        
     try {
       // Await the refresh token function
       const { accessToken, refreshToken } = await refreshUserAccessToken(currentRefreshToken);

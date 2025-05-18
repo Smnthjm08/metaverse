@@ -36,9 +36,7 @@ export default function SignUpPage() {
         email: email,
         name: name,
         password: password,
-        // role: "admin",
       });
-      console.log("dwcwdssdcdsc");
 
       if (!validatedData.success) {
         const formattedErrors: Record<string, string> = {};
@@ -50,8 +48,6 @@ export default function SignUpPage() {
         console.log("eerr", errors);
         return;
       }
-
-      console.log("dwcwwsdefrgthyjhtgrfedsds");
 
       const response = await axios.post(
         "http://localhost:5001/api/v1/auth/signup",

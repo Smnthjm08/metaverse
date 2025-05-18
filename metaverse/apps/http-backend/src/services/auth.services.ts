@@ -43,11 +43,11 @@ export const createUser = async (data: createUserParams) => {
     },
   });
 
-  // if (existingUser) {
-  //   throw new Error("User already exists!");
-  // }
+  if (existingUser) {
+    throw new Error("User already exists!");
+  }
 
-  appAssert(!existingUser, CONFLICT, "Email/username already in Use.");
+  // appAssert(!existingUser, CONFLICT, "Email/username already in Use.");
 
   if (typeof password !== "string") {
     throw new Error("Password needs to be string");
@@ -101,8 +101,6 @@ export const createUser = async (data: createUserParams) => {
 
   // return user without password and token
   const { password: _password, ...userWithoutPassword } = user;
-  console.log("tokens at the end at signup-accessToken", accessToken);
-  console.log("tokens at the end at signup-refreshToken", refreshToken);
   return {
     user: userWithoutPassword,
     accessToken,
@@ -159,8 +157,6 @@ export const signinUser = async (data: signinUserParams) => {
 
   // return user and tokens
   const { password: _password, ...userWithoutPassword } = user;
-  console.log("tokens at the end at signin-accessToken", accessToken);
-  console.log("tokens at the end at signin-refreshToken", refreshToken);
     return {
     user: userWithoutPassword,
     accessToken,
@@ -172,8 +168,6 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
   const { payload } = verifyToken<RefreshTokenPayload>(refreshToken, {
     secret: JWT_SECRET,
   });
-    console.log("tokens at the end at refreshUserAccessToken", refreshToken);
-
 
   if (!payload) {
     throw new Error("Unauthorized, Invalid refresh token");
