@@ -5,6 +5,4 @@ export const userSchema = z.object({
   name: z.string(),
   username: z.string().optional(),
   email: z.string().email().optional(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
 })

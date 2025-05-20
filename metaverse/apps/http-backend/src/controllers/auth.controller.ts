@@ -164,6 +164,6 @@ export const refreshTokenController: RequestHandler = async (
     }
   } catch (error) {
     console.error("Refresh controller error:", error);
-     res.status(500).json({ error: "Internal Server Error" });
+     res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 };

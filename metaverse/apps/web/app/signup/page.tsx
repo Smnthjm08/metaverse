@@ -81,6 +81,7 @@ export default function SignUpPage() {
                     <Input
                       id="email"
                       type="email"
+                      autoComplete="true"
                       placeholder="johndoe@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}

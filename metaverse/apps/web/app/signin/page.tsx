@@ -16,6 +16,7 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "@ui/components/ui/sonner";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 export default function SignInPage() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -24,40 +25,42 @@ export default function SignInPage() {
 
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
+  const  {} = useMutation();
 
-    try {
-      const isEmail = emailOrUsername.includes("@");
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setErrors({});
 
-      let validatedData;
-      if (isEmail) {
-        validatedData = signInSchema.parse({
-          email: emailOrUsername,
-          password: password,
-        });
-      } else {
-        validatedData = signInSchema.parse({
-          username: emailOrUsername,
-          password: password,
-        });
-      }
+  //   try {
+  //     const isEmail = emailOrUsername.includes("@");
 
-      const response = await axios.post(
-        "http://localhost:5001/api/v1/auth/signin",
-        validatedData
-      );
-      console.log("response", response);
-      router.push("/profile");
-      toast.success(response?.data?.message);
+  //     let validatedData;
+  //     if (isEmail) {
+  //       validatedData = signInSchema.parse({
+  //         email: emailOrUsername,
+  //         password: password,
+  //       });
+  //     } else {
+  //       validatedData = signInSchema.parse({
+  //         username: emailOrUsername,
+  //         password: password,
+  //       });
+  //     }
 
-      console.log("Validated data:", validatedData);
-    } catch (error) {
-      toast.error("Error Signing up");
-      console.log("error", error);
-    }
-  };
+  //     const response = await axios.post(
+  //       "http://localhost:5001/api/v1/auth/signin",
+  //       validatedData
+  //     );
+  //     console.log("response", response);
+  //     router.push("/profile");
+  //     toast.success(response?.data?.message);
+
+  //     console.log("Validated data:", validatedData);
+  //   } catch (error) {
+  //     toast.error("Error Signing up");
+  //     console.log("error", error);
+  //   }
+  // };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -65,7 +68,7 @@ export default function SignInPage() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+              <CardTitle className="text-2xl text-center font-semibold">Sign In</CardTitle>
               <CardDescription className="text-center">
                 Enter your email or username below to login to your account
               </CardDescription>
@@ -110,7 +113,7 @@ export default function SignInPage() {
                   <Button type="submit" className="w-full">
                     Signin
                   </Button>
-                  <Button variant="outline" type="button" className="w-full">
+                  <Button variant="outline" disabled type="button" className="w-full">
                     Login with Google
                   </Button>
                 </div>

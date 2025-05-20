@@ -24,7 +24,7 @@ export const getUserController = async (
     res.status(OK).json(userWithoutPassword);
   } catch (error) {
     console.error("Error in getUserController:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 
@@ -43,7 +43,7 @@ export const deleteUserController = async (req: Request, res: Response) => {
       return;
     }
     console.error("Error in deleteUserController:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 

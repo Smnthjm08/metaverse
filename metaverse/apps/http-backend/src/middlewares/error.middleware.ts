@@ -1,6 +1,6 @@
 import { ErrorRequestHandler, Response } from "express";
 import z from "zod";
-import { BAD_REQUEST } from "../constants/http-status.code";
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http-status.code";
 import AppError from "../utils/error.utils";
 import { REFRESH_PATH } from "../utils/cookies";
 
@@ -42,7 +42,7 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     return handleAppError(res, error);
   }
 
-  return res.status(500).send("Internal Server Error");
+  return res.status(INTERNAL_SERVER_ERROR).send("Internal Server Error");
 };
 
 export default errorHandler;

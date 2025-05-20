@@ -29,7 +29,7 @@ export const getSessionsController = async (
       currentSession: session.id === req.sessionId,
     }));
 
-    res.status(200).json(sessionsWithCurrent);
+    res.status(OK).json(sessionsWithCurrent);
   } catch (error) {
     console.error("Error in getSessionsController:", error);
     res

@@ -4,9 +4,9 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "../components/providers/theme-provider";
 import AppBar from "../components/globals/appbar";
 import { Toaster } from "@ui/components/ui/sonner";
+import { TanstackProvider } from "../components/providers/tanstack-provider";
 
-// const inter = Inter({ subsets: ["latin"] });
-const luckiestGuy = Inter({ subsets: ["latin"], weight: "400" });
+const inter = Inter({ subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
   title: "metaverse",
@@ -20,17 +20,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressContentEditableWarning suppressHydrationWarning>
-      <body className={luckiestGuy.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AppBar />
-          {children}
-          <Toaster />
-        </ThemeProvider>
+      <body className={inter.className}>
+        <TanstackProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AppBar />
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </TanstackProvider>
       </body>
     </html>
   );
