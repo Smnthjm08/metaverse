@@ -24,12 +24,14 @@ export const signUpController: RequestHandler = async (
       userAgent: req.headers["user-agent"],
     });
 
+    console.log("parsedData", parsedData);
     if (!parsedData.success) {
       res
         .status(BAD_REQUEST)
         .json({ error: "Invalid data", details: parsedData.error.format() });
       return;
     }
+    console.log("parsedData2", parsedData);
 
     const { user, accessToken, refreshToken } = await createUser(
       parsedData.data
@@ -40,7 +42,6 @@ export const signUpController: RequestHandler = async (
       .json(user);
   } catch (error) {
     console.error(error);
-    // Handle specific errors
     if (error instanceof Error) {
       if (error.message === "User already exists!") {
         console.log("error at opas", error);
@@ -53,7 +54,6 @@ export const signUpController: RequestHandler = async (
         return;
       }
     }
-
     res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 };
@@ -62,23 +62,27 @@ export const signInController: RequestHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const parsedData = signInSchema.safeParse({
-    ...req.body,
-    userAgent: req.headers["user-agent"],
-  });
+  try {
+    const parsedData = signInSchema.safeParse({
+      ...req.body,
+      userAgent: req.headers["user-agent"],
+    });
 
-  if (!parsedData.success) {
-    res
-      .status(BAD_REQUEST)
-      .json({ error: "Invalid data", details: parsedData.error.format() });
-    return;
+    if (!parsedData.success) {
+      res
+        .status(BAD_REQUEST)
+        .json({ error: "Invalid data", details: parsedData.error.format() });
+      return;
+    }
+
+    const { accessToken, refreshToken } = await signinUser(parsedData.data);
+
+    setAuthCookies({ res, accessToken, refreshToken })
+      .status(OK)
+      .json({ message: "Login Successful" });
+  } catch (error: any) {
+    res.status(UNAUTHORIZED).json({ error: error.message || "Login failed" });
   }
-
-  const { accessToken, refreshToken } = await signinUser(parsedData?.data);
-
-  setAuthCookies({ res, accessToken, refreshToken })
-    .status(OK)
-    .json({ message: "Login Successful" });
 };
 
 export const logoutController: RequestHandler = async (

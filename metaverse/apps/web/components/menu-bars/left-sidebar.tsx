@@ -15,7 +15,7 @@ import {
   MenuIcon,
   Twitch,
 } from "lucide-react";
-import { ModeToggle } from "../globals/mode-toggle";
+import { ModeToggle } from "../global/mode-toggle";
 
 export default function LeftSideBar() {
   return (

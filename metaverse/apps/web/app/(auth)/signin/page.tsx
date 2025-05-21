@@ -13,10 +13,11 @@ import { Label } from "@ui/components/ui/label";
 import Link from "next/link";
 import { signInSchema } from "@repo/common/auth";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "@ui/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
+import { signInRequest } from "../../../api/auth.api";
+import { ZodError } from "zod";
 
 export default function SignInPage() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -25,42 +26,62 @@ export default function SignInPage() {
 
   const router = useRouter();
 
-  const  {} = useMutation();
+  const {
+    mutate: signIn,
+    isPending,
+    error,
+  } = useMutation({
+    mutationFn: signInRequest,
+    onSuccess: (response: any) => {
+      console.log("res", response);
+      toast.success(response?.message || "Signed in successfully");
+      router.push("/");
+    },
+    onError: (error: any) => {
+      let errorMessage = "Failed to sign in. Please try again.";
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setErrors({});
+      if (error?.response?.data?.error) {
+        errorMessage = error?.response?.data?.error;
+      }
 
-  //   try {
-  //     const isEmail = emailOrUsername.includes("@");
+      toast.error(errorMessage);
+    },
+  });
 
-  //     let validatedData;
-  //     if (isEmail) {
-  //       validatedData = signInSchema.parse({
-  //         email: emailOrUsername,
-  //         password: password,
-  //       });
-  //     } else {
-  //       validatedData = signInSchema.parse({
-  //         username: emailOrUsername,
-  //         password: password,
-  //       });
-  //     }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
 
-  //     const response = await axios.post(
-  //       "http://localhost:5001/api/v1/auth/signin",
-  //       validatedData
-  //     );
-  //     console.log("response", response);
-  //     router.push("/profile");
-  //     toast.success(response?.data?.message);
+    try {
+      const isEmail = emailOrUsername.includes("@");
 
-  //     console.log("Validated data:", validatedData);
-  //   } catch (error) {
-  //     toast.error("Error Signing up");
-  //     console.log("error", error);
-  //   }
-  // };
+      // ✅ Provide both fields, set unused one to undefined
+      const loginData = {
+        email: isEmail ? emailOrUsername : undefined,
+        username: !isEmail ? emailOrUsername : undefined,
+        password,
+      };
+
+      // Validate with Zod
+      try {
+        signInSchema.parse(loginData);
+        signIn(loginData); // ✅ This now matches z.infer<typeof signInSchema>
+      } catch (zodError) {
+        if (zodError instanceof ZodError) {
+          const formattedErrors: Record<string, string> = {};
+          zodError.errors.forEach((err) => {
+            const path = err.path.join(".");
+            formattedErrors[path] = err.message;
+          });
+          setErrors(formattedErrors);
+          toast.error("Please fix the form errors");
+        }
+      }
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+      toast.error(error?.message || "An unexpected error occurred");
+    }
+  };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -68,7 +89,9 @@ export default function SignInPage() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-center font-semibold">Sign In</CardTitle>
+              <CardTitle className="text-2xl text-center font-semibold">
+                Sign In
+              </CardTitle>
               <CardDescription className="text-center">
                 Enter your email or username below to login to your account
               </CardDescription>
@@ -86,6 +109,12 @@ export default function SignInPage() {
                       onChange={(e) => setEmailOrUsername(e.target.value)}
                       required
                     />
+                    {errors.email && (
+                      <p className="text-sm text-red-500">{errors.email}</p>
+                    )}
+                    {errors.username && (
+                      <p className="text-sm text-red-500">{errors.username}</p>
+                    )}
                   </div>
 
                   <div className="grid gap-2">
@@ -110,10 +139,15 @@ export default function SignInPage() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Signin
+                  <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending ? "Signing in..." : "Sign In"}
                   </Button>
-                  <Button variant="outline" disabled type="button" className="w-full">
+                  <Button
+                    variant="outline"
+                    disabled
+                    type="button"
+                    className="w-full"
+                  >
                     Login with Google
                   </Button>
                 </div>

@@ -34,78 +34,85 @@ export type RefreshTokenPayload = {
 };
 
 export const createUser = async (data: createUserParams) => {
-  // verify existing user doesn't exist
   const { username, email, password, userAgent } = data;
 
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [{ username }, { email }],
-    },
-  });
+  try {
+    // Check for existing user
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { email }],
+      },
+    });
 
-  if (existingUser) {
-    throw new Error("User already exists!");
-  }
-
-  // appAssert(!existingUser, CONFLICT, "Email/username already in Use.");
-
-  if (typeof password !== "string") {
-    throw new Error("Password needs to be string");
-  }
-
-  const hashedPassword = await encryptPassword(password, 10);
-
-  // create user
-  const user = await prisma.user.create({
-    data: {
-      username: username,
-      email: email,
-      password: hashedPassword,
-    },
-  });
-
-  // create verfication code
-  await prisma.verificationCode.create({
-    data: {
-      userId: user?.id,
-      type: VerificationCodeTypes.email,
-      expiresAt: oneYearFromNow(),
-    },
-  });
-
-  // TODO: send email
-
-  // create session
-  const session = await prisma.sessions.create({
-    data: {
-      userId: user?.id,
-      userAgent: userAgent,
-      expiresAt: oneYearFromNow(),
-    },
-  });
-
-  // sign access and refresh token
-  const accessToken = jwt.sign(
-    { sessionId: session?.id, userId: user?.id },
-    JWT_SECRET,
-    {
-      expiresIn: "15m",
-      audience: ["user"],
+    if (existingUser) {
+      throw new Error("User already exists!");
     }
-  );
 
-  const refreshToken = jwt.sign({ sessionId: session?.id }, JWT_SECRET, {
-    expiresIn: "30d",
-    audience: ["user"],
-  });
+    if (typeof password !== "string") {
+      throw new Error("Password needs to be string");
+    }
 
-  // return user without password and token
-  const { password: _password, ...userWithoutPassword } = user;
-  return {
-    user: userWithoutPassword,
-    accessToken,
-    refreshToken,
-  };
+    const hashedPassword = await encryptPassword(password, 10);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    // Create verification code
+    await prisma.verificationCode.create({
+      data: {
+        userId: user.id,
+        type: VerificationCodeTypes.email,
+        expiresAt: oneYearFromNow(),
+      },
+    });
+
+    // TODO: Send verification email
+
+    // Create session
+    const session = await prisma.sessions.create({
+      data: {
+        userId: user.id,
+        userAgent,
+        expiresAt: oneYearFromNow(),
+      },
+    });
+
+    // Sign tokens
+    const accessToken = jwt.sign(
+      { sessionId: session.id, userId: user.id },
+      JWT_SECRET,
+      {
+        expiresIn: "15m",
+        audience: ["user"],
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { sessionId: session.id },
+      JWT_SECRET,
+      {
+        expiresIn: "30d",
+        audience: ["user"],
+      }
+    );
+
+    const { password: _password, ...userWithoutPassword } = user;
+
+    return {
+      user: userWithoutPassword,
+      accessToken,
+      refreshToken,
+    };
+  } catch (err) {
+    console.error("Error in createUser:", err);
+    throw err; // Let the controller handle the response
+  }
 };
 
 export const signinUser = async (data: signinUserParams) => {
