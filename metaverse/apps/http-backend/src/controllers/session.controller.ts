@@ -23,7 +23,7 @@ export const getSessionsController = async (
       },
     });
 
-    // Add isCurrent property to each session
+    //isCurrent property to each session
     const sessionsWithCurrent = sessions.map((session) => ({
       ...session,
       currentSession: session.id === req.sessionId,

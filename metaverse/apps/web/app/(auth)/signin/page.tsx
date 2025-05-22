@@ -14,10 +14,10 @@ import Link from "next/link";
 import { signInSchema } from "@repo/common/auth";
 import { useState } from "react";
 import { toast } from "@ui/components/ui/sonner";
-import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { signInRequest } from "../../../api/auth.api";
 import { ZodError } from "zod";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignInPage() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -26,6 +26,9 @@ export default function SignInPage() {
 
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/app";
+
   const {
     mutate: signIn,
     isPending,
@@ -33,10 +36,10 @@ export default function SignInPage() {
   } = useMutation({
     mutationFn: signInRequest,
     onSuccess: (response: any) => {
-      console.log("res", response);
       toast.success(response?.message || "Signed in successfully");
-      router.push("/");
+      router.push(redirect);
     },
+
     onError: (error: any) => {
       let errorMessage = "Failed to sign in. Please try again.";
 
@@ -55,17 +58,17 @@ export default function SignInPage() {
     try {
       const isEmail = emailOrUsername.includes("@");
 
-      // ✅ Provide both fields, set unused one to undefined
       const loginData = {
         email: isEmail ? emailOrUsername : undefined,
         username: !isEmail ? emailOrUsername : undefined,
         password,
+        userAgent:
+          typeof window !== "undefined" ? window.navigator.userAgent : "",
       };
 
-      // Validate with Zod
       try {
         signInSchema.parse(loginData);
-        signIn(loginData); // ✅ This now matches z.infer<typeof signInSchema>
+        signIn(loginData);
       } catch (zodError) {
         if (zodError instanceof ZodError) {
           const formattedErrors: Record<string, string> = {};

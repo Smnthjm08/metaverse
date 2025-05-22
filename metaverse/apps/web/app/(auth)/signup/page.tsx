@@ -17,7 +17,6 @@ import { toast } from "@ui/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { signUpRequest } from "../../../api/auth.api";
-import { ZodError } from "zod";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -36,45 +35,38 @@ export default function SignUpPage() {
   } = useMutation({
     mutationFn: signUpRequest,
     onSuccess: (response: any) => {
-      console.log("Signup success response:", response);
       toast.success("Signed up successfully");
-      router.push("/profile");
+      router.push("/app");
     },
     onError: (error: any) => {
-      console.error("Signup error:", error);
       let errorMessage = "Failed to sign up. Please try again.";
 
       if (error?.response?.data?.error) {
         errorMessage = error?.response?.data?.error;
       }
 
-      // toast.error(errorMessage);
+      toast.error(errorMessage);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
-    
+
     try {
-      console.log("Preparing signup data");
-      
-      // Include confirmPassword in the signup data
+
       const signupData = {
         username,
         email,
         name,
         password,
-        confirmPassword
+        confirmPassword,
       };
-      
-      console.log("Validating with Zod schema");
+
       try {
-        // Validate the data before sending
         const validatedData = signUpSchema.safeParse(signupData);
-        
+
         if (!validatedData.success) {
-          console.error("Zod validation error:", validatedData.error);
           const formattedErrors: Record<string, string> = {};
           validatedData.error.errors.forEach((err) => {
             const path = err.path[0] as string;
@@ -84,25 +76,20 @@ export default function SignUpPage() {
           toast.error("Please fix the form errors");
           return;
         }
-        
-        console.log("Data validated successfully:", validatedData.data);
-        
-        // Only send required fields to the API
+
         const apiData = {
           username: validatedData.data.username,
           email: validatedData.data.email,
           name: validatedData.data.name,
           password: validatedData.data.password,
-          confirmPassword: validatedData.data.confirmPassword
+          confirmPassword: validatedData.data.confirmPassword,
         };
-        
+
         signUp(apiData);
       } catch (error: any) {
-        console.error("Unexpected validation error:", error);
         toast.error("Validation error: " + (error.message || "Unknown error"));
       }
     } catch (error: any) {
-      console.error("Unexpected error:", error);
       toast.error(error?.message || "An unexpected error occurred");
     }
   };
@@ -188,14 +175,16 @@ export default function SignUpPage() {
                     <Label htmlFor="password">ConfirmPassword</Label>
                     <Input
                       id="confirmPassword"
-                      type="confirmPassword"
+                      type="password"
                       placeholder="********"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
-                    {errors.password && (
-                      <p className="text-sm text-red-500">{errors.password}</p>
+                    {errors.confirmPassword && (
+                      <p className="text-sm text-red-500">
+                        {errors.confirmPassword}
+                      </p>
                     )}
                   </div>
 
