@@ -1,7 +1,14 @@
 import { Request, Response } from "express";
 import { INTERNAL_SERVER_ERROR, OK } from "../constants/http-status.code";
 import { prisma } from "@repo/db/client";
-import z from "zod";
+
+interface sessionTypes {
+  id: number;
+  expiresAt: Date;
+  createdAt: Date;
+  userAgent: string | null;
+  currentSession?: boolean;
+}
 
 export const getSessionsController = async (
   req: Request,
@@ -24,7 +31,7 @@ export const getSessionsController = async (
     });
 
     //isCurrent property to each session
-    const sessionsWithCurrent = sessions.map((session) => ({
+    const sessionsWithCurrent = sessions.map((session: sessionTypes) => ({
       ...session,
       currentSession: session.id === req.sessionId,
     }));

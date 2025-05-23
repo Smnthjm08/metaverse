@@ -28,12 +28,9 @@ export const signUpController: RequestHandler = async (
     if (!parsedData.success) {
       res
         .status(BAD_REQUEST)
-        // .json({error: parsedData.error });
         .json(parsedData.error.format());
-        // .json({ error: "Invalid data", details: parsedData.error.format() });
       return;
     }
-    console.log("parsedData2", parsedData);
 
     const { user, accessToken, refreshToken } = await createUser(
       parsedData.data

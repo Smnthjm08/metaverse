@@ -12,12 +12,12 @@ import {
 } from "../utils/date.utils";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../configs/env";
-import appAssert from "../utils/app-assert.utils";
-import { CONFLICT } from "../constants/http-status.code";
+
 
 export type createUserParams = {
   username: string;
   email: string;
+  name?: string;
   password: string;
   userAgent?: string;
 };
@@ -34,7 +34,7 @@ export type RefreshTokenPayload = {
 };
 
 export const createUser = async (data: createUserParams) => {
-  const { username, email, password, userAgent } = data;
+  const { username, email, password, userAgent, name } = data;
 
   try {
     // Check for existing user
@@ -59,6 +59,7 @@ export const createUser = async (data: createUserParams) => {
       data: {
         username,
         email,
+        name,
         password: hashedPassword,
       },
     });
