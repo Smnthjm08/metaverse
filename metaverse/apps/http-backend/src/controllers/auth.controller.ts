@@ -24,16 +24,12 @@ export const signUpController: RequestHandler = async (
       userAgent: req.headers["user-agent"],
     });
 
-    console.log("parsedData", parsedData);
     if (!parsedData.success) {
       res
         .status(BAD_REQUEST)
-        // .json({error: parsedData.error });
         .json(parsedData.error.format());
-        // .json({ error: "Invalid data", details: parsedData.error.format() });
       return;
     }
-    console.log("parsedData2", parsedData);
 
     const { user, accessToken, refreshToken } = await createUser(
       parsedData.data
@@ -46,12 +42,10 @@ export const signUpController: RequestHandler = async (
     console.error(error);
     if (error instanceof Error) {
       if (error.message === "User already exists!") {
-        console.log("error at opas", error);
         res.status(BAD_REQUEST).json({ error: error.message });
         return;
       }
       if (error.message === "Password needs to be string") {
-        console.log("error at Password", error);
         res.status(BAD_REQUEST).json({ error: error.message });
         return;
       }
@@ -133,7 +127,8 @@ export const refreshTokenController: RequestHandler = async (
     const currentRefreshToken = req.cookies.refreshToken;
     
     if (!currentRefreshToken) {
-       res.status(UNAUTHORIZED).json({ message: "Missing Refresh Token" });
+      res.status(UNAUTHORIZED).json({ message: "Missing Refresh Token" });
+      return;
     }
         
     try {
@@ -157,19 +152,26 @@ export const refreshTokenController: RequestHandler = async (
       }
       
       // Send the response
-       res.status(OK).json({
+      res.status(OK).json({
         message: "Access Token Refreshed",
       });
+      return;
+      
     } catch (tokenError) {
       console.error("Token refresh error:", tokenError);
-       res.status(UNAUTHORIZED).json({ 
+      res.status(UNAUTHORIZED).json({ 
         message: "Invalid or expired refresh token",
         // @ts-ignore
         error: tokenError.message 
       });
+      return;
     }
+    
   } catch (error) {
     console.error("Refresh controller error:", error);
-     res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+    
+    if (!res.headersSent) {
+      res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+    }
   }
 };

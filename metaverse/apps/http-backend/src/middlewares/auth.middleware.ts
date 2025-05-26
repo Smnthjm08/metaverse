@@ -15,7 +15,7 @@ const authenticate: RequestHandler = (req: Request, res: Response, next: NextFun
   const accessToken = req.cookies.accessToken as string | undefined;
 
   if (!accessToken) {
-    res.status(UNAUTHORIZED).json({ message: "Unauthorized" });
+    res.status(UNAUTHORIZED).json({ message: "InvalidAccessToken" });
     return;
   }
 
@@ -28,7 +28,7 @@ const authenticate: RequestHandler = (req: Request, res: Response, next: NextFun
     }
 
     if (error) {
-      res.status(UNAUTHORIZED).json({ message: "Invalid access token" });
+      res.status(UNAUTHORIZED).json({ message: "InvalidAccessToken" });
       return;
     }
 
@@ -42,4 +42,3 @@ const authenticate: RequestHandler = (req: Request, res: Response, next: NextFun
 };
 
 export default authenticate;
-export {};
