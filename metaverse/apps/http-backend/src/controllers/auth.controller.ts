@@ -127,7 +127,8 @@ export const refreshTokenController: RequestHandler = async (
     const currentRefreshToken = req.cookies.refreshToken;
     
     if (!currentRefreshToken) {
-       res.status(UNAUTHORIZED).json({ message: "Missing Refresh Token" });
+      res.status(UNAUTHORIZED).json({ message: "Missing Refresh Token" });
+      return;
     }
         
     try {
@@ -151,20 +152,26 @@ export const refreshTokenController: RequestHandler = async (
       }
       
       // Send the response
-       res.status(OK).json({
+      res.status(OK).json({
         message: "Access Token Refreshed",
       });
       return;
+      
     } catch (tokenError) {
       console.error("Token refresh error:", tokenError);
-       res.status(UNAUTHORIZED).json({ 
+      res.status(UNAUTHORIZED).json({ 
         message: "Invalid or expired refresh token",
         // @ts-ignore
         error: tokenError.message 
       });
+      return;
     }
+    
   } catch (error) {
     console.error("Refresh controller error:", error);
-     res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+    
+    if (!res.headersSent) {
+      res.status(INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
+    }
   }
 };
