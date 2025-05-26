@@ -5,13 +5,17 @@ export const AUTH = "auth";
 
 // staleTime keeps user data fresh indefinitely
 const useAuth = (options = {}) => {
-  const { data: user , ...rest } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    ...option
+  } = useQuery({
     queryKey: [AUTH],
     queryFn: getUser,
     staleTime: Infinity,
     ...options,
   });
-  return { user, ...rest };
+  return { user, isLoading, ...option };
 };
 
 export default useAuth;
