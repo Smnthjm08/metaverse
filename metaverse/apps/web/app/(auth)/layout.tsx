@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import Loading from "../../components/global/loading";
 
 export default function RootLayout({

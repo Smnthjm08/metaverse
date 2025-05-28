@@ -5,7 +5,6 @@ const getEnv = (key: string, defautValue?: string): string => {
     throw new Error(`Missing env variable ${key}`);
   }
 
-  console.log("env", key, value);
   return value;
 };
 

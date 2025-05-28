@@ -19,10 +19,8 @@ API.interceptors.response.use(
     const { status, data } = response || {};
 
     // Handle 401 Unauthorized error
-    console.log("response", response)
     if (status === 401 && data?.message === "InvalidAccessToken") {
       try {
-        console.log("Refreshing token...");
         await API.get("/auth/refresh");
         return TokenRefreshToken(config);
       } catch (error) {
@@ -34,8 +32,5 @@ API.interceptors.response.use(
     return Promise.reject({ ...error });
   }
 );
-
-// Request interceptor for adding authorization token
-// API.interceptors.request
 
 export default API;

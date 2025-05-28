@@ -5,7 +5,7 @@ import useAuth from "../../../../hooks/useAuth";
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
 
-  console.log("user", user);
+  console.log("user at profile page", user);
 
   return (
     <main className="flex items-center justify-center min-h-screen">

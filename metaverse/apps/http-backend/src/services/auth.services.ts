@@ -20,6 +20,7 @@ export type createUserParams = {
   name?: string;
   password: string;
   userAgent?: string;
+  avatarId?: number;
 };
 
 export type signinUserParams = {
@@ -34,7 +35,7 @@ export type RefreshTokenPayload = {
 };
 
 export const createUser = async (data: createUserParams) => {
-  const { username, email, password, userAgent, name } = data;
+  const { username, email, password, userAgent, name, avatarId } = data;
 
   try {
     // Check for existing user
@@ -61,6 +62,7 @@ export const createUser = async (data: createUserParams) => {
         email,
         name,
         password: hashedPassword,
+        avatarId: avatarId,
       },
     });
 

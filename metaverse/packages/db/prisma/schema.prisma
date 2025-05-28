@@ -39,8 +39,8 @@ model User {
   verificationCodes VerificationCode[]
   sessions          Sessions[]
 
-  // avatarId Int?    @default(1)
-  // avatar   Avatar? @relation(fields: [avatarId], references: [id])
+  avatarId Int?    @default(1)
+  avatar   Avatar? @relation(fields: [avatarId], references: [id])
 }
 
 model VerificationCode {
@@ -68,7 +68,7 @@ model Avatar {
   id       Int     @id @unique @default(autoincrement())
   imageUrl String?
   name     String?
-  // users    User[]
+  users    User[]
 }
 
 model Space {

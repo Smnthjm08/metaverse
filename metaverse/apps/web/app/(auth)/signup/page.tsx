@@ -61,6 +61,7 @@ export default function SignUpPage() {
         name,
         password,
         confirmPassword,
+        avatarId: 1,
       };
 
       try {

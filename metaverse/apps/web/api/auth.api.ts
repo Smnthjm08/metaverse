@@ -20,3 +20,13 @@ export const signUpRequest = async (data: any): Promise<any> => {
     throw error;
   }
 };
+
+export const logoutRequest = async (): Promise<any> => {
+  try {
+    const response = await API.get("/auth/logout");
+    console.log("Logout response:", response);
+  } catch (error: any) {
+    // @ts-ignore
+    throw error;
+  }
+}
