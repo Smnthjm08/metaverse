@@ -12,7 +12,10 @@ const useAuth = (options = {}) => {
   } = useQuery({
     queryKey: [AUTH],
     queryFn: getUser,
-    staleTime: Infinity,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+
+    // staleTime: Infinity,
     ...options,
   });
   return { user, isLoading, ...option };

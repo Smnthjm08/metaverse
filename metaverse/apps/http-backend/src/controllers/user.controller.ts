@@ -1,6 +1,11 @@
 import { prisma } from "@repo/db/client";
 import { Request, Response } from "express";
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } from "../constants/http-status.code";
+import {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
+  OK,
+} from "../constants/http-status.code";
 import { userSchema } from "@repo/common/user";
 
 export const getUserController = async (
@@ -12,6 +17,19 @@ export const getUserController = async (
       where: {
         id: req?.userId,
       },
+      select: {
+        avatar: {
+          select: {
+            imageUrl: true,
+          },
+        },
+        name: true,
+        username: true,
+        email: true,
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     // check if user exists
@@ -20,11 +38,12 @@ export const getUserController = async (
       return;
     }
 
-    const { password, ...userWithoutPassword } = user;
-    res.status(OK).json(userWithoutPassword);
+    res.status(OK).json({...user, avatar: user.avatar?.imageUrl });
   } catch (error) {
     console.error("Error in getUserController:", error);
-    res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -43,14 +62,16 @@ export const deleteUserController = async (req: Request, res: Response) => {
       return;
     }
     console.error("Error in deleteUserController:", error);
-    res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
 export const updateUserController = async (req: Request, res: Response) => {
   try {
     // Use id from params if present, otherwise fallback to req.userId
-    const id = req.params.id ;
+    const id = req.params.id;
 
     const user = await prisma.user.findFirst({
       where: {
@@ -90,6 +111,8 @@ export const updateUserController = async (req: Request, res: Response) => {
     res.status(OK).json(userWithoutPassword);
   } catch (error) {
     console.error("Error in updateUserController:", error);
-    res.status(INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
