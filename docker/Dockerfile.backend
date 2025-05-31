@@ -1,0 +1,29 @@
+FROM node:23-alpine
+
+WORKDIR /usr/src/app
+
+# Enable Corepack and set up pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.1 --activate
+
+# Copy monorepo root files first
+COPY ./packages ./packages
+COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
+COPY ./package.json ./package.json
+COPY ./turbo.json ./turbo.json
+
+# Copy the whole monorepo structure (keep it low in the Dockerfile to leverage caching)
+COPY ./apps/http-backend ./apps/http-backend
+
+# Install dependencies with workspace support
+RUN pnpm install --frozen-lockfile
+# RUN pnpm add -g typescript
+
+# Generate Prisma client
+RUN pnpm --filter db... run db:generate
+
+# Build the backend app
+RUN pnpm run build:backend
+
+EXPOSE 5001
+
+CMD ["pnpm", "run", "--filter", "http-backend", "start:backend"]
