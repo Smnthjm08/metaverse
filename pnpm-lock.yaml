@@ -20,6 +20,9 @@ importers:
       turbo:
         specifier: ^2.3.3
         version: 2.5.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   apps/http-backend:
     dependencies:
