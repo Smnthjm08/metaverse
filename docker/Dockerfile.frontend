@@ -19,10 +19,8 @@ COPY ./apps/web ./apps/web
 RUN pnpm install --frozen-lockfile
 
 # If you have a separate db package, copy and generate it
-# Replace 'db-package-name' with your actual db package name
-RUN pnpm --filter="db-package-name" run db:generate || echo "No db:generate script found, skipping..."
+RUN pnpm --filter="db" run db:generate || echo "No db:generate script found, skipping..."
 
-# Alternative: if db:generate is in the root, run it directly
 # RUN pnpm run db:generate || echo "No db:generate script found, skipping..."
 
 # Build the web application
