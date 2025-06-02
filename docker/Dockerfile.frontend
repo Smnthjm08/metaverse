@@ -2,8 +2,6 @@ FROM node:23-alpine
 
 WORKDIR /usr/src/app
 
-ARG DATABASE_URL
-
 RUN corepack enable && corepack prepare pnpm@9.15.1 --activate
 
 # Copy all necessary files for workspace resolution
@@ -13,18 +11,14 @@ COPY ./package.json ./package.json
 COPY ./turbo.json ./turbo.json
 
 COPY ./packages ./packages
-
 COPY ./apps/web ./apps/web
 
 RUN pnpm install --frozen-lockfile
 
-# If you have a separate db package, copy and generate it
-RUN pnpm --filter="db" run db:generate || echo "No db:generate script found, skipping..."
+RUN pnpm --filter db run db:generate || echo "No db package found"
 
-# RUN pnpm run db:generate || echo "No db:generate script found, skipping..."
-
-# Build the web application
-RUN DATABASE_URL=${DATABASE_URL} pnpm run build:web
+# build the web application
+RUN pnpm run build:web
 
 EXPOSE 3001
 
