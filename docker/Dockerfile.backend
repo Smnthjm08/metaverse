@@ -15,6 +15,9 @@ COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
 COPY ./packages ./packages
 COPY ./apps/http-backend ./apps/http-backend
 
+COPY ./apps/http-backend/.env.example ./apps/http-backend/.env
+COPY ./packages/db/.env.example ./packages/db/.env
+
 # install all dependencies
 RUN pnpm install --frozen-lockfile --prod=false
 
