@@ -4,21 +4,25 @@ WORKDIR /usr/src/app
 
 RUN corepack enable && corepack prepare pnpm@9.15.1 --activate
 
-# Copy all necessary files for workspace resolution
+# Copy workspace configuration files
 COPY ./pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
 COPY ./package.json ./package.json
 COPY ./turbo.json ./turbo.json
 
+# Copy all packages and the web app
 COPY ./packages ./packages
 COPY ./apps/web ./apps/web
 
+# Install all dependencies
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm --filter db run db:generate || echo "No db package found"
+# Generate Prisma client first (if needed)
+RUN pnpm --filter @repo/db run db:generate || echo "No db package found"
 
-# build the web application
-RUN pnpm run build:web
+# Use Turbo to build everything with proper dependency order
+# This will automatically build @repo/common before building the web app
+RUN pnpm turbo build --filter=web
 
 EXPOSE 3001
 
