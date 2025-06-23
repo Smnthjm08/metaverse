@@ -12,8 +12,8 @@ export default function ProfilePage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen">
-      <div className="font-bold text-yellow-300">This is profile page</div>
-      {/* <div className="text-white">{user?.name}</div> */}
+      <div className="font-bold text-yellow-300">This is profile page and needs to be removed.</div>
+      <div className="text-white">{user?.name}</div>
     </main>
   );
 }

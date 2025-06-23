@@ -2,7 +2,7 @@ import "@ui/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "../components/providers/theme-provider";
-import AppBar from "../components/global/appbar";
+// import AppBar from "../components/global/appbar";
 import { Toaster } from "@ui/components/ui/sonner";
 import { TanstackProvider } from "../components/providers/tanstack-provider";
 
@@ -28,7 +28,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <AppBar />
+            {/* <AppBar /> */}
             {children}
             <Toaster />
           </ThemeProvider>
