@@ -9,10 +9,10 @@ interface User {
   username: string;
   email: string;
   id: string;
-  createdAt: string;
-  updatedAt: string;
+  verified: boolean;
+  createdAt?: string; // Made optional to match schema
+  updatedAt?: string; // Made optional to match schema
 }
-
 
 // staleTime keeps user data fresh indefinitely
 type UseAuthReturn = {
@@ -31,15 +31,14 @@ const useAuth = (options = {}): UseAuthReturn => {
     queryFn: getUser,
     staleTime: 0,
     refetchOnWindowFocus: false,
-
     // staleTime: Infinity,
     ...options,
   });
 
-  if(!data){
+  if (!data) {
     return { user: undefined, isLoading, ...option };
   }
-console.log("useAuth data:", data);
+  console.log("useAuth data:", data);
   const user: User = data?.data;
 
   return { user, isLoading, ...option };

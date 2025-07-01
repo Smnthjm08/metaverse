@@ -38,7 +38,10 @@ export const getUserController = async (
       return;
     }
 
-    res.status(OK).json({...user, avatar: user.avatar?.imageUrl });
+    res.status(OK).json({
+      ...user,
+      avatar: user.avatar ? user.avatar.imageUrl : null,
+    });
   } catch (error) {
     console.error("Error in getUserController:", error);
     res

@@ -25,23 +25,29 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@ui/components/ui/sidebar";
+import { NavUser } from "./nav-user";
+import useAuth from "../../hooks/useAuth";
 
-// Navigation data
 const navigationItems = [
   {
-    title: "App",
+    title: "Home",
     icon: Home,
     url: "/app",
-  },
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    url: "/dashboard",
   },
   {
     title: "Settings",
     icon: Settings,
     url: "/settings",
+    items: [
+      {
+        title: "Profile",
+        url: "/settings/profile",
+      },
+      {
+        title: "Sessions",
+        url: "/settings/sessions",
+      },
+    ],
   },
   {
     title: "Team",
@@ -66,13 +72,20 @@ const navigationItems = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const { user, isLoading } = useAuth();
 
-  const isActive = (url: string) => {
-    if (url === '/app') {
-      return pathname === '/app';
-    }
-    return pathname.startsWith(url);
-  };
+const isActive = (url: string) => {
+  return pathname === url || pathname.startsWith(url + "/");
+};
+
+
+  if (!user && isLoading) {
+    return (
+      <>
+        <div>loading...</div>
+      </>
+    );
+  }
 
   return (
     <Sidebar {...props}>
@@ -102,7 +115,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <SidebarMenu className="ml-6 mt-1 border-l pl-2">
                         {item.items.map((subItem) => (
                           <SidebarMenuItem key={subItem.title}>
-                            <SidebarMenuButton asChild isActive={isActive(subItem.url)}>
+                            <SidebarMenuButton
+                              asChild
+                              isActive={isActive(subItem.url)}
+                            >
                               <Link href={subItem.url} className="text-sm">
                                 {subItem.title}
                               </Link>
@@ -126,6 +142,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             )}
           </SidebarMenu>
         </SidebarGroup>
+        <div className="mt-auto">
+          <SidebarGroup>{user && <NavUser user={user} />}</SidebarGroup>
+        </div>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

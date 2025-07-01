@@ -5,7 +5,8 @@
   "exports": {
     "./auth": "./dist/schemas/auth.schema.js",
     "./user": "./dist/schemas/user.schema.js",
-    "./space": "./dist/schemas/space.schema.js"
+    "./space": "./dist/schemas/space.schema.js",
+    "./edit-user": "./dist/schemas/editUser.schema.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

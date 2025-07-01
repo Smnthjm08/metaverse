@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import Loading from "../../components/global/loading";
-import { AppSidebar } from "../../components/layouts/global-sidebar-layout";
+import { AppSidebar } from "../../components/sidebar/sidebar-layout";
 import {
   SidebarProvider,
   SidebarInset,

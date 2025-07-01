@@ -13,6 +13,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "components/sidebar"  ],
   "exclude": ["node_modules"]
 }

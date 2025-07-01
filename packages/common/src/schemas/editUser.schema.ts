@@ -13,17 +13,6 @@ export const editUserSchema = z.object({
   }),
   createdAt: z.string(),
   updatedAt: z.string(),
-  verified: z.boolean(),
+  verified: z.boolean().optional(),
   avatar: z.string().optional(),
 });
-
-export const userSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  username: z.string().optional(),
-  email: z.string().email().optional(),
-  avatar: z.string().url().optional(),
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
-  verified: z.boolean().optional(),
-})
