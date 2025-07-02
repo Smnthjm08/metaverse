@@ -10,11 +10,10 @@ interface User {
   email: string;
   id: string;
   verified: boolean;
-  createdAt?: string; // Made optional to match schema
-  updatedAt?: string; // Made optional to match schema
+  createdAt: string;
+  updatedAt: string;
 }
 
-// staleTime keeps user data fresh indefinitely
 type UseAuthReturn = {
   user: User | undefined;
   isLoading: boolean;

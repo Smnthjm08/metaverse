@@ -143,7 +143,7 @@ const isActive = (url: string) => {
           </SidebarMenu>
         </SidebarGroup>
         <div className="mt-auto">
-          <SidebarGroup>{user && <NavUser user={user} />}</SidebarGroup>
+          <SidebarGroup>{user && user?.createdAt && <NavUser user={user} />}</SidebarGroup>
         </div>
       </SidebarContent>
       <SidebarRail />

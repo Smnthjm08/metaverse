@@ -18,27 +18,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@ui/components/ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, ControllerRenderProps } from "react-hook-form";
 import { Camera, Edit2 } from "lucide-react";
 import { useState } from "react";
-import { editUserSchema } from "@repo/common/edit-user.schema";
-import useAuth from "../../../../hooks/useAuth";
-import { z } from "zod";
+import useAuth from '../../../../hooks/useAuth';
 
-
-// @ts-ignore
-type EditUserFormData = z.infer<typeof editUserSchema>
-
-const mockUser = {
-  id: "cmb80attx0001y4cdtjnfc91f",
-  name: "Maria Fernanda",
-  email: "maria@example.com",
-  username: "maria.fernanda",
-  createdAt: "2025-05-28T13:54:10.436Z",
-  updatedAt: "2025-06-23T17:58:26.596Z",
-  verified: true,
-  avatar: "https://robohash.org/mail@ashallendesign.co.uk",
+type EditUserFormData = {
+  id: string;
+  name: string;
+  email: string;
+  username: string;
+  createdAt: string;
+  updatedAt: string;
+  verified: boolean;
+  avatar?: string;
 };
 
 export default function ProfilePage() {
@@ -46,7 +39,6 @@ export default function ProfilePage() {
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
 
   const form = useForm<EditUserFormData>({
-    resolver: zodResolver(editUserSchema),
     defaultValues: {
       id: user?.id || "",
       name: user?.name || "",
@@ -57,11 +49,24 @@ export default function ProfilePage() {
       verified: user?.verified || false,
       avatar: user?.avatar || "",
     },
+    mode: "onChange",
   });
 
   function onSubmit(values: EditUserFormData) {
+    // Basic validation
+    if (!values.name.trim()) {
+      form.setError("name", { message: "Name is required" });
+      return;
+    }
+    if (!values.email.trim() || !values.email.includes("@")) {
+      form.setError("email", { message: "Valid email is required" });
+      return;
+    }
+    if (!values.username.trim()) {
+      form.setError("username", { message: "Username is required" });
+      return;
+    }
     console.log("Profile updated:", values);
-    // Handle form submission here
   }
 
   const handleAvatarEdit = () => {
@@ -76,7 +81,7 @@ export default function ProfilePage() {
           <h1 className="text-4xl font-bold mb-2">Profile</h1>
           <p className="text-gray-400">View all your profile details here.</p>
         </div>
-        {/* <Form {...any}> */}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -86,7 +91,7 @@ export default function ProfilePage() {
                     <FormField
                       control={form.control}
                       name="name"
-                      render={({ field }) => (
+                      render={({ field }: { field: ControllerRenderProps<EditUserFormData, "name"> }) => (
                         <FormItem>
                           <FormControl>
                             <Input
@@ -139,7 +144,7 @@ export default function ProfilePage() {
                     <FormField
                       control={form.control}
                       name="username"
-                      render={({ field }) => (
+                      render={({ field }: { field: ControllerRenderProps<EditUserFormData, "username"> }) => (
                         <FormItem>
                           <FormLabel className="text-gray-400">
                             Username
@@ -148,6 +153,7 @@ export default function ProfilePage() {
                             <Input
                               {...field}
                               className="border-gray-600 text-white"
+                              disabled={true}
                               placeholder="username"
                             />
                           </FormControl>
@@ -159,13 +165,14 @@ export default function ProfilePage() {
                     <FormField
                       control={form.control}
                       name="email"
-                      render={({ field }) => (
+                      render={({ field }: { field: ControllerRenderProps<EditUserFormData, "email"> }) => (
                         <FormItem>
                           <FormLabel className="text-gray-400">Email</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="email"
+                              disabled={true}
                               className="border-gray-600 text-white"
                               placeholder="email@example.com"
                             />
@@ -178,7 +185,7 @@ export default function ProfilePage() {
                     <FormField
                       control={form.control}
                       name="avatar"
-                      render={({ field }) => (
+                      render={({ field }: { field: ControllerRenderProps<EditUserFormData, "avatar"> }) => (
                         <FormItem className="hidden">
                           <FormControl>
                             <Input {...field} type="hidden" />
@@ -203,7 +210,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 gap-4">
-                    <div className="p-4 bg-gray-800 rounded-lg">
+                    <div className="p-4 rounded-lg">
                       <div className="text-sm text-gray-400 mb-1">User ID</div>
                       <div className="text-white font-mono text-sm">
                         {user?.id}
@@ -211,7 +218,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 bg-gray-800 rounded-lg">
+                      <div className="p-4 rounded-lg">
                         <div className="text-sm text-gray-400 mb-1">
                           Account Created
                         </div>
@@ -222,7 +229,7 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      <div className="p-4 bg-gray-800 rounded-lg">
+                      <div className="p-4 rounded-lg">
                         <div className="text-sm text-gray-400 mb-1">
                           Last Updated
                         </div>
@@ -234,7 +241,7 @@ export default function ProfilePage() {
                       </div>
                     </div>
 
-                    <div className="p-4 bg-gray-800 rounded-lg">
+                    <div className="p-4 rounded-lg">
                       <div className="text-sm text-gray-400 mb-2">
                         Account Status
                       </div>
@@ -257,7 +264,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 px-8 py-2">
+              <Button type="submit" className=" px-8 py-2">
                 Save Profile
               </Button>
             </div>
