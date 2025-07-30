@@ -17,6 +17,10 @@ interface User {
 type UseAuthReturn = {
   user: User | undefined;
   isLoading: boolean;
+  isError: boolean;
+  error: any;
+  isAuthenticated: boolean;
+  refetch: () => void;
   [key: string]: any;
 };
 
@@ -24,23 +28,43 @@ const useAuth = (options = {}): UseAuthReturn => {
   const {
     data,
     isLoading,
-    ...option
+    isError,
+    error,
+    refetch,
+    ...otherOptions
   } = useQuery({
     queryKey: [AUTH],
     queryFn: getUser,
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
-    // staleTime: Infinity,
     ...options,
   });
 
-  if (!data) {
-    return { user: undefined, isLoading, ...option };
+  // Handle case when query fails or returns no data
+  if (isError || !data) {
+    return { 
+      user: undefined, 
+      isLoading, 
+      isError, 
+      error,
+      isAuthenticated: false,
+      refetch,
+      ...otherOptions 
+    };
   }
-  console.log("useAuth data:", data);
-  const user: User = data?.data;
 
-  return { user, isLoading, ...option };
+  console.log("useAuth data:", data?.data);
+  const user: User = data.data;
+
+  return { 
+    user, 
+    isLoading, 
+    isError, 
+    error,
+    isAuthenticated: !!user,
+    refetch,
+    ...otherOptions 
+  };
 };
 
 export default useAuth;

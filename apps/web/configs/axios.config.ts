@@ -18,6 +18,10 @@ API.interceptors.response.use(
     const { config, response } = error;
     const { status, data } = response || {};
 
+    if (status === 401 && data?.message === "Missing Refresh Token" ){
+      console.log("missing refresh token", data?.message);
+    }
+
     // Handle 401 Unauthorized error
     if (status === 401 && data?.message === "InvalidAccessToken") {
       try {

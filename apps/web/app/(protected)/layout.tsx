@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import Loading from "../../components/global/loading";
 import { AppSidebar } from "../../components/sidebar/sidebar-layout";
@@ -17,17 +17,19 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, isError } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname(); 
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push(`/signin?redirect=${pathname}`);
+      return;
     }
   }, [user]);
 
-  if (isLoading || (!isLoading && !user)) {
+  if (isLoading && !user) {
+    console.log("Loading user data or user not authenticated");
     return <Loading />;
   }
 

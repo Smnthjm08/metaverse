@@ -6,15 +6,16 @@ import useAuth from "../hooks/useAuth";
 import { useEffect } from "react";
 import Link from "next/link";
 
-export default function Home() {
-  const { user } = useAuth();
+export default function Page() {
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
+    // If user is authenticated, redirect to app
+    if (!isLoading && user) {
       router.push("/app");
     }
-  }, [user, router]);
+  }, [user, isLoading, router]);
 
   return (
     <main className="flex flex-row items-center justify-center min-h-screen">

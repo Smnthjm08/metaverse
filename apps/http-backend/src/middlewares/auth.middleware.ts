@@ -27,6 +27,10 @@ const authenticate: RequestHandler = (req: Request, res: Response, next: NextFun
       return;
     }
 
+    if (error && error.message === "Missing Refresh Token"){
+      console.log("===============")
+    }
+
     if (error) {
       res.status(UNAUTHORIZED).json({ message: "InvalidAccessToken" });
       return;
